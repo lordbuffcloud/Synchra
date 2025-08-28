@@ -31,9 +31,9 @@ export default function Header() {
               )}
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-neon-gradient bg-clip-text text-transparent">
+              <div className="text-xl font-bold bg-neon-gradient bg-clip-text text-transparent">
                 {appName}
-              </h1>
+              </div>
               <p className="text-xs text-muted-foreground -mt-1">
                 tune probability with precision audio
               </p>

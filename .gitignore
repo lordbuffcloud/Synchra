@@ -1,3 +1,40 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+dist/
+
+# Caches
+.cache/
+
+# Env
+.env*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor
+.DS_Store
+.vscode/
+
+# Playwright
+playwright-report/
+blob-report/
+test-results/
+
+# Audio assets (keep manifest)
+public/tracks/**/*.webm
+public/tracks/**/*.m4a
+public/tracks/**/*.mp3
+public/tracks/**/*.wav
+public/tracks/peaks/**/*.json
+!public/tracks/tracks.json
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

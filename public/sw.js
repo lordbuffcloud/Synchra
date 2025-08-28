@@ -48,6 +48,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
+  // Ignore non-http(s) schemes (e.g., chrome-extension)
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return
+  }
+
   // Handle audio files specially
   if (url.pathname.startsWith('/tracks/') && 
       (url.pathname.endsWith('.webm') || 

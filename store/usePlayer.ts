@@ -154,8 +154,9 @@ const usePlayer = create<PlayerState>()(
           outputNode = audioGraph.applyNormalization(source, currentTrack.gainDb) || source
         }
 
-        // Connect to crossfader
-        outputNode.connect(audioGraph.getCrossfader().getInactiveInput())
+        // Connect to crossfader inputs and perform crossfade if switching
+        const crossfader = audioGraph.getCrossfader()
+        outputNode.connect(crossfader.getInactiveInput())
 
         // Handle playback end
         source.onended = () => {
@@ -164,8 +165,9 @@ const usePlayer = create<PlayerState>()(
           }
         }
 
-        // Start playback
+        // Start playback and crossfade
         source.start()
+        await crossfader.crossfade(get().crossfadeDuration)
         set({ currentSource: source, isPlaying: true })
 
         // Start timer if set

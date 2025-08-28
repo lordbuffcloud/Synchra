@@ -131,6 +131,10 @@ export class CrossfadeNode {
   getInactiveInput(): GainNode {
     return this.currentInput === 'A' ? this.inputB : this.inputA
   }
+
+  getActiveInput(): GainNode {
+    return this.currentInput === 'A' ? this.inputA : this.inputB
+  }
 }
 
 export class NoiseGenerator {

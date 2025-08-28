@@ -59,37 +59,53 @@ class TrackFetcher {
       throw new Error('Invalid Google Drive folder URL')
     }
 
-    try {
-      // Try public folder access first
-      const publicUrl = `https://drive.google.com/embeddedfolderview?id=${folderId}#list`
-      console.log(`🔍 Scanning public folder: ${folderId}`)
-      
-      // For demo purposes, we'll create a mock response
-      // In real implementation, you'd scrape the HTML or use the API
-      const mockFiles: DriveFileInfo[] = [
-        {
-          id: 'demo1',
-          name: 'delta_2hz_deep_sleep.wav',
-          downloadUrl: `https://drive.google.com/uc?id=demo1&export=download`,
-        },
-        {
-          id: 'demo2', 
-          name: 'theta_6hz_meditation.mp3',
-          downloadUrl: `https://drive.google.com/uc?id=demo2&export=download`,
-        },
-        {
-          id: 'demo3',
-          name: 'alpha_10hz_focus.flac',
-          downloadUrl: `https://drive.google.com/uc?id=demo3&export=download`,
-        },
-      ]
-
-      console.log(`✅ Found ${mockFiles.length} audio files in folder`)
-      return mockFiles
-    } catch (error) {
-      console.error('❌ Failed to fetch from folder, falling back to API key method')
-      return this.fetchFromApi(folderId)
+    // Prefer API if key is available (more reliable), otherwise scrape
+    if (process.env.GOOGLE_API_KEY) {
+      return this.fetchFromApiRecursive(folderId)
     }
+
+    console.log(`🔍 Scanning public folder (scrape): ${folderId}`)
+    const visited = new Set<string>()
+    const allFiles: DriveFileInfo[] = []
+
+    const crawl = async (id: string) => {
+      if (visited.has(id)) return
+      visited.add(id)
+      const url = `https://drive.google.com/embeddedfolderview?id=${id}#list`
+      const res = await fetch(url)
+      const html = await res.text()
+
+      // Find file links
+      const linkRegex = /href=\"([^\"]*?id=([a-zA-Z0-9_-]{10,}))[^\"]*\"[^>]*>([^<]+)<\/a>/g
+      let match: RegExpExecArray | null
+      const audioExt = /\.(mp3|wav|flac|m4a)$/i
+
+      while ((match = linkRegex.exec(html)) !== null) {
+        const href = match[1]
+        const idMatch = match[2]
+        const text = match[3].trim()
+
+        // Subfolder links usually point to embeddedfolderview again or to /folders/
+        if (/embeddedfolderview|\/folders\//.test(href)) {
+          // Likely a folder, recurse
+          await crawl(idMatch)
+          continue
+        }
+
+        // File links typically point to /uc?id=...; filter audio files
+        if (audioExt.test(text)) {
+          allFiles.push({
+            id: idMatch,
+            name: text,
+            downloadUrl: `https://drive.google.com/uc?id=${idMatch}&export=download`,
+          })
+        }
+      }
+    }
+
+    await crawl(folderId)
+    console.log(`✅ Found ${allFiles.length} audio files in public folder (scrape)`)   
+    return allFiles
   }
 
   private extractFolderId(url: string): string | null {
@@ -143,6 +159,37 @@ class TrackFetcher {
       console.error('❌ Google Drive API error:', error)
       return []
     }
+  }
+
+  private async fetchFromApiRecursive(folderId: string): Promise<DriveFileInfo[]> {
+    const apiKey = process.env.GOOGLE_API_KEY
+    if (!apiKey) return []
+
+    const files: DriveFileInfo[] = []
+
+    const list = async (parentId: string) => {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${parentId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,size,md5Checksum)`
+      const response = await fetch(url)
+      const data = await response.json()
+      const entries = (data.files || [])
+      for (const entry of entries) {
+        if (entry.mimeType === 'application/vnd.google-apps.folder') {
+          await list(entry.id)
+        } else if (/\.(mp3|wav|flac|m4a)$/i.test(entry.name)) {
+          files.push({
+            id: entry.id,
+            name: entry.name,
+            downloadUrl: `https://drive.google.com/uc?id=${entry.id}&export=download`,
+            size: parseInt(entry.size || '0') || undefined,
+            etag: entry.md5Checksum,
+          })
+        }
+      }
+    }
+
+    await list(folderId)
+    console.log(`✅ Found ${files.length} audio files via Drive API`)
+    return files
   }
 
   async downloadFile(file: DriveFileInfo): Promise<string> {
@@ -227,29 +274,45 @@ class TrackFetcher {
 
   async generateWaveformPeaks(inputPath: string, outputBaseName: string): Promise<string> {
     const peaksPath = path.join(PEAKS_DIR, `${outputBaseName}.json`)
-    
+    const { spawn } = await import('child_process')
+
     try {
-      // Extract 512 samples for waveform visualization
-      const cmd = `ffmpeg -i "${inputPath}" -ac 1 -ar 8000 -f f32le - 2>/dev/null | head -c $((512*4))`
-      const { stdout } = await execAsync(cmd, { encoding: 'buffer' })
-      
+      // Stream raw float32 PCM and capture first 512 samples (2048 bytes)
+      const args = ['-i', inputPath, '-ac', '1', '-ar', '8000', '-f', 'f32le', '-']
+      const child = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'ignore'] })
+
+      const chunks: Buffer[] = []
+      let total = 0
+      const targetBytes = 512 * 4
+
+      await new Promise<void>((resolve, reject) => {
+        child.stdout.on('data', (chunk: Buffer) => {
+          if (total >= targetBytes) {
+            child.kill('SIGTERM')
+            return
+          }
+          const remaining = targetBytes - total
+          const toPush = chunk.length > remaining ? chunk.subarray(0, remaining) : chunk
+          chunks.push(toPush)
+          total += toPush.length
+          if (total >= targetBytes) {
+            child.kill('SIGTERM')
+          }
+        })
+        child.on('error', reject)
+        child.on('close', () => resolve())
+      })
+
+      const buffer = Buffer.concat(chunks)
       const samples: number[] = []
-      for (let i = 0; i < stdout.length; i += 4) {
-        if (i + 3 < stdout.length) {
-          const view = new DataView(stdout.buffer, i, 4)
-          samples.push(view.getFloat32(0, true))
-        }
+      for (let i = 0; i + 3 < buffer.length; i += 4) {
+        samples.push(buffer.readFloatLE(i))
       }
 
-      // Normalize and create peaks
-      const maxSample = Math.max(...samples.map(Math.abs))
-      const normalizedPeaks = samples.map(s => s / maxSample * 100)
+      const maxSample = Math.max(1e-6, ...samples.map(Math.abs))
+      const normalizedPeaks = samples.map(s => (s / maxSample) * 100)
 
-      await fs.writeFile(peaksPath, JSON.stringify({
-        peaks: normalizedPeaks,
-        length: samples.length,
-      }))
-      
+      await fs.writeFile(peaksPath, JSON.stringify({ peaks: normalizedPeaks, length: samples.length }))
       console.log(`📊 Generated waveform: ${outputBaseName}.json`)
       return `peaks/${outputBaseName}.json`
     } catch (error) {

@@ -36,14 +36,10 @@ export default function PlayerPage() {
   const loadTrackData = async () => {
     try {
       const trackData = await getTrack(trackId)
-      if (!trackData) {
-        router.push('/404')
-        return
-      }
-      setTrack(trackData)
+      // Do not navigate away; show not-found state in-page
+      setTrack(trackData || null)
     } catch (error) {
       console.error('Failed to load track:', error)
-      router.push('/404')
     } finally {
       setIsLoading(false)
     }
@@ -83,6 +79,7 @@ export default function PlayerPage() {
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
               <p className="text-muted-foreground">Loading track...</p>
+              <p className="mt-2">No track selected</p>
             </div>
           </div>
         </div>

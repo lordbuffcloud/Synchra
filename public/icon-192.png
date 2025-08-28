@@ -1,0 +1,5 @@
+# This should be a 192x192 PNG icon file
+# For now, using the SVG as reference - you'll need to generate actual PNG files
+# You can use the icon.svg as a template and convert it to PNG at 192x192 and 512x512
+# Tools like ImageMagick, online converters, or design software can help:
+# convert icon.svg -resize 192x192 icon-192.png

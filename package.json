@@ -1,0 +1,46 @@
+{
+  "name": "synchra",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "tsx scripts/postbuild.ts && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "prepare": "tsx scripts/fetch_tracks.ts",
+    "refresh:tracks": "tsx scripts/fetch_tracks.ts && git add -A && git commit -m \"chore(tracks): refresh\" || echo \"no changes\"",
+    "deploy:vercel": "vercel --prod"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slider": "^1.1.2",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "lucide-react": "^0.263.1",
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.37.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^3.12.7",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

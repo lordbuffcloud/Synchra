@@ -1,0 +1,73 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --background: #0b0d10;
+  --foreground: #ffffff;
+  --card: #1a1d23;
+  --card-foreground: #ffffff;
+  --popover: #1a1d23;
+  --popover-foreground: #ffffff;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #374151;
+  --secondary-foreground: #ffffff;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #4f46e5;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #374151;
+  --input: #374151;
+  --ring: #3b82f6;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+}
+
+.micro-motion {
+  @apply transition-all duration-[120ms] ease-out;
+}
+
+.micro-motion:hover {
+  @apply scale-105 opacity-90;
+}
+
+.micro-motion:active {
+  @apply scale-95;
+}
+
+.neon-glow {
+  @apply shadow-neon-sm hover:shadow-neon-md transition-shadow duration-200;
+}
+
+.coder-graffiti {
+  font-family: 'IBM Plex Mono', 'Consolas', monospace;
+  text-shadow: 0 0 5px currentColor;
+}

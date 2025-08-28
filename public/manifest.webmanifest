@@ -1,0 +1,56 @@
+{
+  "name": "Synchra",
+  "short_name": "Synchra",
+  "description": "Tune probability with precision audio - binaural beats for focus, relaxation, and consciousness exploration",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d10",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "categories": ["music", "health", "productivity"],
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Focus Tracks",
+      "short_name": "Focus",
+      "description": "Browse focus-enhancing tracks",
+      "url": "/?filter=Focus",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sleep Tracks",
+      "short_name": "Sleep",
+      "description": "Browse sleep-inducing tracks",
+      "url": "/?filter=Deep%20Sleep",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-wide.png", 
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

@@ -544,6 +544,11 @@ async function main() {
 }
 
 if (require.main === module) {
+  // Skip fetching/transcoding on CI/Vercel environments where FFmpeg isn't available
+  if (process.env.CI || process.env.VERCEL) {
+    console.log('⏭️  Skipping track fetch on CI/Vercel environment')
+    process.exit(0)
+  }
   main()
 }
 

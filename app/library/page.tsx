@@ -9,7 +9,25 @@ import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manif
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
 
-const targetStates: (TargetState | 'All')[] = ['All', 'Focus', 'Deep Sleep', 'Lucid', 'Calm', 'Recovery', 'Custom']
+const targetStates: (TargetState | 'All')[] = [
+  'All',
+  'Focus',
+  'Deep Sleep',
+  'Lucid',
+  'Calm',
+  'Recovery',
+  'Custom',
+  // NV intents
+  'Remote Viewing',
+  'Astral Projection',
+  'Focused Trance',
+  'Inner Visuals',
+  'Memory/Imagery',
+  'Calm Focus',
+  'Reintegration',
+  'Theta Drift',
+  'Hemispheric Balance',
+]
 
 export default function LibraryPage() {
   const searchParams = useSearchParams()
@@ -117,8 +135,8 @@ export default function LibraryPage() {
   const handleCacheTrack = async (track: Track) => {
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       const urls = [
-        `/tracks/${track.filenameWebm}`,
-        `/tracks/${track.filenameAac}`
+        track.remoteWebmUrl || `/tracks/${track.filenameWebm}`,
+        track.remoteAacUrl || `/tracks/${track.filenameAac}`
       ]
       
       for (const url of urls) {

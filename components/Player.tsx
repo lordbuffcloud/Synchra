@@ -404,6 +404,39 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
         </button>
       </div>
 
+      {/* Spec Panel */}
+      <div className="mt-6 p-4 bg-muted/10 rounded-lg text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <div className="text-muted-foreground">Beat/Core</div>
+            <div className="font-mono">
+              {track.beatHz ? `${track.beatHz} Hz` : '—'}
+            </div>
+            <div className="text-xs text-muted-foreground">Schumann option: {track.tags?.some(t => /schumann/i.test(t)) ? 'Yes' : 'No'}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Processing</div>
+            <div className="text-xs space-y-1">
+              <div>HRV 0.1 Hz: {track.tags?.some(t => /hrv/i.test(t) || /0\.1\s*hz/i.test(t)) ? 'Yes' : 'No'}</div>
+              <div>Gamma 40 Hz: {track.tags?.some(t => /gamma\s*40/i.test(t) || /40\s*hz/i.test(t)) ? 'Yes' : 'No'}</div>
+              <div>Micro-ITD drift: {track.tags?.some(t => /microitd|itd|spatial/i.test(t)) ? 'Yes' : 'No'}</div>
+              <div>Stochastic dither: {track.tags?.some(t => /dither|white\s*noise/i.test(t)) ? 'Yes' : 'No'}</div>
+              <div>Spindle 13 Hz: {track.tags?.some(t => /spindle|13\s*hz/i.test(t)) ? 'Yes' : 'No'}</div>
+              <div>Hemi-alternator: {track.tags?.some(t => /hemi|alternator/i.test(t)) ? 'Yes' : 'No'}</div>
+            </div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Delivery</div>
+            <div className="text-xs space-y-1">
+              <div>Opus/AAC: auto</div>
+              <div>Gapless: yes</div>
+              <div>Streaming: byte-range</div>
+              <div>Duration: {formatTime(track.durationSec)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Advanced Settings */}
       {showSettings && (
         <div className="mt-6 p-6 bg-muted/20 rounded-lg space-y-6">

@@ -78,4 +78,5 @@ next-env.d.ts
 /public/tracks/*.webm
 /public/tracks/*.m4a
 /public/tracks/*.json
+!/public/tracks/tracks.json
 /public/tracks/peaks/

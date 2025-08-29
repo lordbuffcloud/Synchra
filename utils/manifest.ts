@@ -1,6 +1,7 @@
 import { TrackManifest, Track } from '@/types/track'
 
 let cachedManifest: TrackManifest | null = null
+const MEDIA_BASE_URL = process.env.NEXT_PUBLIC_MEDIA_BASE_URL
 
 export async function loadTrackManifest(): Promise<TrackManifest> {
   if (cachedManifest) {
@@ -16,7 +17,18 @@ export async function loadTrackManifest(): Promise<TrackManifest> {
       throw new Error(`Failed to load manifest: ${response.status} ${response.statusText}`)
     }
 
-    cachedManifest = await response.json()
+    const raw: TrackManifest = await response.json()
+
+    // If a remote media base URL is configured, map filenames to absolute URLs
+    if (MEDIA_BASE_URL) {
+      raw.tracks = raw.tracks.map((t) => ({
+        ...t,
+        remoteWebmUrl: t.remoteWebmUrl || `${MEDIA_BASE_URL.replace(/\/$/, '')}/${t.filenameWebm}`,
+        remoteAacUrl: t.remoteAacUrl || `${MEDIA_BASE_URL.replace(/\/$/, '')}/${t.filenameAac}`,
+      }))
+    }
+
+    cachedManifest = raw
     return cachedManifest
   } catch (error) {
     console.error('Failed to load track manifest:', error)

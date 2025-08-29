@@ -33,6 +33,11 @@ export interface PlayerState {
   audioGraph: AudioGraph | null
   noiseGenerator: NoiseGenerator | null
   currentSource: AudioBufferSourceNode | null
+  // Streaming media elements for byte-range playback
+  mediaA: HTMLAudioElement | null
+  mediaB: HTMLAudioElement | null
+  activeMediaSlot: 'A' | 'B' | null
+  rafId?: number | null
   
   // Actions
   initializeAudio: () => Promise<void>
@@ -75,6 +80,10 @@ const usePlayer = create<PlayerState>()(
       audioGraph: null,
       noiseGenerator: null,
       currentSource: null,
+      mediaA: null,
+      mediaB: null,
+      activeMediaSlot: null,
+      rafId: null,
 
       initializeAudio: async () => {
         const { audioGraph } = get()
@@ -85,12 +94,25 @@ const usePlayer = create<PlayerState>()(
         
         // Connect noise generator to master output
         noiseGen.connect(graph.getMasterGain())
+
+        // Create two persistent media elements and connect to crossfader inputs
+        const mediaA = new Audio()
+        const mediaB = new Audio()
+        mediaA.preload = 'auto'
+        mediaB.preload = 'auto'
+        mediaA.crossOrigin = 'anonymous'
+        mediaB.crossOrigin = 'anonymous'
+
+        const sourceA = graph.createMediaElementSource(mediaA)
+        const sourceB = graph.createMediaElementSource(mediaB)
+        sourceA.connect(graph.getCrossfader().getInputA())
+        sourceB.connect(graph.getCrossfader().getInputB())
         
-        set({ audioGraph: graph, noiseGenerator: noiseGen })
+        set({ audioGraph: graph, noiseGenerator: noiseGen, mediaA, mediaB, activeMediaSlot: null })
       },
 
       loadTrack: async (track: Track) => {
-        const { audioGraph, normalizeEnabled } = get()
+        const { audioGraph } = get()
         if (!audioGraph) {
           await get().initializeAudio()
         }
@@ -100,26 +122,48 @@ const usePlayer = create<PlayerState>()(
         try {
           await audioGraph!.resume()
 
-          // Determine which format to use (prefer Opus for better compression)
+          // Determine codec
           const supportsOpus = 'MediaSource' in window && MediaSource.isTypeSupported('audio/webm; codecs="opus"')
-          const trackUrl = supportsOpus ? `/tracks/${track.filenameWebm}` : `/tracks/${track.filenameAac}`
+          const trackUrl = supportsOpus
+            ? (track.remoteWebmUrl || `/tracks/${track.filenameWebm}`)
+            : (track.remoteAacUrl || `/tracks/${track.filenameAac}`)
 
-          // Fetch and decode audio
-          const response = await fetch(trackUrl)
-          if (!response.ok) {
-            throw new Error(`Failed to load track: ${response.status}`)
+          const { mediaA, mediaB, activeMediaSlot, isPlaying, crossfadeDuration } = get()
+          if (!mediaA || !mediaB) {
+            throw new Error('Media elements not initialized')
           }
 
-          const arrayBuffer = await response.arrayBuffer()
-          const audioBuffer = await audioGraph!.getContext().decodeAudioData(arrayBuffer)
+          // Choose target slot: if none active yet, use A; otherwise use inactive for crossfade
+          const targetSlot: 'A' | 'B' = activeMediaSlot === 'A' ? 'B' : 'A'
+          const targetEl = targetSlot === 'A' ? mediaA : mediaB
+          const activeEl = activeMediaSlot === 'A' ? mediaA : mediaB
 
-          // Store audio buffer in track for reuse
-          ;(track as any)._audioBuffer = audioBuffer
-
-          set({ 
-            duration: audioBuffer.duration,
-            isLoading: false,
+          // Load new source into target slot
+          await new Promise<void>((resolve, reject) => {
+            targetEl.onloadedmetadata = () => resolve()
+            targetEl.onerror = () => reject(new Error('Failed to load media'))
+            targetEl.src = trackUrl
+            targetEl.load()
           })
+
+          // Update duration from the newly loaded media
+          set({ duration: targetEl.duration || track.durationSec, isLoading: false })
+
+          if (!activeMediaSlot) {
+            // First load: set active slot but do not auto-play
+            set({ activeMediaSlot: targetSlot })
+          } else if (isPlaying) {
+            // Crossfade to new track while playing
+            targetEl.currentTime = 0
+            targetEl.loop = !!get().loopEnabled
+            await targetEl.play()
+            await audioGraph!.getCrossfader().crossfade(crossfadeDuration)
+            if (activeEl) activeEl.pause()
+            set({ activeMediaSlot: targetSlot })
+          } else {
+            // Not playing: switch active slot to target for next play
+            set({ activeMediaSlot: targetSlot })
+          }
 
           // Add to recent tracks
           get().addToRecent(track.id)
@@ -132,82 +176,50 @@ const usePlayer = create<PlayerState>()(
       },
 
       play: async () => {
-        const { currentTrack, audioGraph, normalizeEnabled, loopEnabled, timerMinutes } = get()
-        if (!currentTrack || !audioGraph) return
+        const { currentTrack, audioGraph, loopEnabled, timerMinutes, mediaA, mediaB, activeMediaSlot } = get()
+        if (!currentTrack || !audioGraph || !mediaA || !mediaB || !activeMediaSlot) return
 
         await audioGraph.resume()
 
-        // Stop current source if playing
-        const { currentSource } = get()
-        if (currentSource) {
-          currentSource.stop()
-        }
+        const active = activeMediaSlot === 'A' ? mediaA : mediaB
+        active.loop = !!loopEnabled
+        await active.play()
+        set({ isPlaying: true })
 
-        // Create new source
-        const source = audioGraph.getContext().createBufferSource()
-        source.buffer = (currentTrack as any)._audioBuffer
-        source.loop = loopEnabled
-
-        // Apply normalization if enabled
-        let outputNode: AudioNode = source
-        if (normalizeEnabled && currentTrack.gainDb) {
-          outputNode = audioGraph.applyNormalization(source, currentTrack.gainDb) || source
-        }
-
-        // Connect to crossfader inputs and perform crossfade if switching
-        const crossfader = audioGraph.getCrossfader()
-        outputNode.connect(crossfader.getInactiveInput())
-
-        // Handle playback end
-        source.onended = () => {
-          if (!loopEnabled) {
-            set({ isPlaying: false, currentTime: 0 })
-          }
-        }
-
-        // Start playback and crossfade
-        source.start()
-        await crossfader.crossfade(get().crossfadeDuration)
-        set({ currentSource: source, isPlaying: true })
-
-        // Start timer if set
         if (timerMinutes && !get().timerStartTime) {
           set({ timerStartTime: Date.now() })
-          
           setTimeout(() => {
             get().pause()
             set({ timerStartTime: null })
           }, timerMinutes * 60 * 1000)
         }
 
-        // Update current time
-        const updateTime = () => {
-          if (get().isPlaying && source.buffer) {
-            const elapsed = audioGraph.getContext().currentTime - (source as any).startTime
-            set({ currentTime: elapsed })
-            requestAnimationFrame(updateTime)
-          }
+        const step = () => {
+          const { isPlaying } = get()
+          if (!isPlaying) return
+          set({ currentTime: active.currentTime })
+          const rafId = requestAnimationFrame(step)
+          set({ rafId })
         }
-        ;(source as any).startTime = audioGraph.getContext().currentTime
-        updateTime()
+        step()
       },
 
       pause: () => {
-        const { currentSource } = get()
-        if (currentSource) {
-          currentSource.stop()
-        }
-        set({ isPlaying: false, currentSource: null })
+        const { mediaA, mediaB, rafId } = get()
+        if (rafId) cancelAnimationFrame(rafId)
+        if (mediaA) mediaA.pause()
+        if (mediaB) mediaB.pause()
+        set({ isPlaying: false, rafId: null })
       },
 
       seek: (time: number) => {
-        const { isPlaying } = get()
-        set({ currentTime: time })
-        
-        if (isPlaying) {
-          get().pause()
-          // Restart from new position would require more complex implementation
-          // For now, just update the time
+        const { mediaA, mediaB, activeMediaSlot } = get()
+        const active = activeMediaSlot === 'A' ? mediaA : mediaB
+        if (active) {
+          active.currentTime = Math.max(0, Math.min(time, active.duration || Infinity))
+          set({ currentTime: active.currentTime })
+        } else {
+          set({ currentTime: time })
         }
       },
 

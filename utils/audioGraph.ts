@@ -54,8 +54,8 @@ export class AudioGraph {
     this.masterGain.gain.setTargetAtTime(value, now, 0.1)
   }
 
-  applyNormalization(source: AudioBufferSourceNode, gainDb: number) {
-    if (gainDb === 0) return source
+  applyNormalization(source: AudioNode, gainDb: number): AudioNode {
+    if (!gainDb) return source
 
     const gainNode = this.audioContext.createGain()
     const linearGain = Math.pow(10, gainDb / 20)
@@ -63,6 +63,10 @@ export class AudioGraph {
 
     source.connect(gainNode)
     return gainNode
+  }
+
+  createMediaElementSource(element: HTMLMediaElement): MediaElementAudioSourceNode {
+    return this.audioContext.createMediaElementSource(element)
   }
 }
 

@@ -9,9 +9,11 @@ import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manif
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
 
-const targetStates: TargetState[] = ['Focus', 'Deep Sleep', 'Lucid', 'Calm', 'Recovery', 'Custom']
+const baseStateKeys = ['Focus', 'Deep Sleep', 'Lucid', 'Calm', 'Recovery', 'Custom'] as const
+type BaseState = typeof baseStateKeys[number]
+const targetStates: BaseState[] = baseStateKeys
 
-const stateDescriptions = {
+const stateDescriptions: Record<BaseState, string> = {
   'Focus': 'Enhanced concentration and productivity',
   'Deep Sleep': 'Restorative sleep and recovery',
   'Lucid': 'Meditation and consciousness exploration',

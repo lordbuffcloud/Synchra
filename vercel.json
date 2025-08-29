@@ -1,11 +1,6 @@
 {
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
-  "functions": {
-    "app/api/**/*": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "headers": [
     {
       "source": "/tracks/(.*)",

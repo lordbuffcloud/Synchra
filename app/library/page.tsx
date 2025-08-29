@@ -297,7 +297,7 @@ export default function LibraryPage() {
             {/* Category Filter */}
             <div className="flex items-center space-x-2 overflow-x-auto pb-2 sm:pb-0">
               <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              {[...targetStates, 'favorites'].map((state) => (
+              {([...(targetStates as (TargetState | 'All')[]), 'favorites'] as Array<TargetState | 'All' | 'favorites'>).map((state) => (
                 <button
                   key={state}
                   onClick={() => setSelectedState(state)}

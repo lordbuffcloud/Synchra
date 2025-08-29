@@ -404,7 +404,7 @@ class TrackFetcher {
   }
 
   private generateDescription(state: TargetState, beatHz?: number): string {
-    const descriptions = {
+    const descriptions: Partial<Record<TargetState, string>> = {
       'Focus': 'Enhance concentration and mental clarity for productive work sessions.',
       'Deep Sleep': 'Promote deep, restorative sleep and natural recovery cycles.',
       'Lucid': 'Support meditation, creativity, and conscious awareness states.',
@@ -413,7 +413,7 @@ class TrackFetcher {
       'Custom': 'Specialized frequency targeting for unique applications.',
     }
 
-    let desc = descriptions[state]
+    let desc = descriptions[state] || 'Engineered binaural session for targeted mental states.'
     if (beatHz) {
       desc += ` Features ${beatHz}Hz binaural beats for optimal entrainment.`
     }

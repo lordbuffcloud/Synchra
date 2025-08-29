@@ -9,17 +9,22 @@ import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manif
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
 
-const baseStateKeys = ['Focus', 'Deep Sleep', 'Lucid', 'Calm', 'Recovery', 'Custom'] as const
-type BaseState = typeof baseStateKeys[number]
-const targetStates: BaseState[] = [...baseStateKeys]
-
-const stateDescriptions: Record<BaseState, string> = {
+const stateDescriptions: Partial<Record<TargetState, string>> = {
   'Focus': 'Enhanced concentration and productivity',
   'Deep Sleep': 'Restorative sleep and recovery',
   'Lucid': 'Meditation and consciousness exploration',
   'Calm': 'Stress relief and relaxation',
   'Recovery': 'Healing and restoration',
   'Custom': 'Specialized frequencies',
+  'Remote Viewing': 'Quiet alertness for analytic imagery and RV sessions.',
+  'Astral Projection': 'Theta stabilization and deepening for out-of-body practice.',
+  'Focused Trance': 'Tight, intentional trance without fatigue.',
+  'Inner Visuals': 'Spacious, stable theta for sustained imagery.',
+  'Memory/Imagery': 'Theta core with spindle-friendly modulation for linkage.',
+  'Calm Focus': 'Alpha→theta breath-paced steadiness.',
+  'Reintegration': 'Clean handoff back to waking via alpha return.',
+  'Theta Drift': 'Gentle micro-variation to avoid habituation.',
+  'Hemispheric Balance': 'Alternating lateral emphasis for refreshed attention.',
 }
 
 export default function HomePage() {
@@ -251,7 +256,7 @@ export default function HomePage() {
             </div>
             
             <div className="space-y-12">
-              {targetStates.map((state) => {
+              {[...new Set(tracks.map(t => t.targetState))].map((state) => {
                 const stateTracks = getTracksByStateData(state)
                 if (stateTracks.length === 0) return null
                 

@@ -398,7 +398,7 @@ class TrackFetcher {
       targetState,
       baseFreqHz,
       beatHz,
-      tags: [...new Set(tags)], // Remove duplicates
+      tags: Array.from(new Set(tags)), // Remove duplicates
       description,
     }
   }

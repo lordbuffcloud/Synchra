@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search, Filter, Heart, Clock, Download, Trash2, RefreshCw } from 'lucide-react'
 import Header from '@/components/Header'
@@ -29,7 +29,7 @@ const targetStates: (TargetState | 'All')[] = [
   'Hemispheric Balance',
 ]
 
-export default function LibraryPage() {
+function LibraryPageClient() {
   const searchParams = useSearchParams()
   const initialFilter = searchParams.get('filter') as TargetState | 'favorites' | null
 
@@ -407,5 +407,13 @@ export default function LibraryPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background"><div className="container mx-auto px-4 py-8"><div className="flex items-center justify-center min-h-[50vh]"><div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div></div></div>}>
+      <LibraryPageClient />
+    </Suspense>
   )
 }

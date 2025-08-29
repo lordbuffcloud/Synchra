@@ -144,10 +144,10 @@ export class CrossfadeNode {
 export class NoiseGenerator {
   private audioContext: AudioContext
   private bufferSize = 4096
-  private noiseBuffer: AudioBuffer
+  private noiseBuffer!: AudioBuffer
   private sourceNode?: AudioBufferSourceNode
-  private gainNode: GainNode
-  private filterNode: BiquadFilterNode
+  private gainNode!: GainNode
+  private filterNode!: BiquadFilterNode
   private noiseType: 'pink' | 'brown' | 'white' = 'pink'
 
   constructor(audioContext: AudioContext) {

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'synchra-v1'
-const STATIC_CACHE_NAME = 'synchra-static-v1'
-const AUDIO_CACHE_NAME = 'synchra-audio-v1'
+const CACHE_NAME = 'synchra-v2'
+const STATIC_CACHE_NAME = 'synchra-static-v2'
+const AUDIO_CACHE_NAME = 'synchra-audio-v2'
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [

@@ -10,7 +10,7 @@ export async function loadTrackManifest(): Promise<TrackManifest> {
 
   try {
     const response = await fetch('/tracks/tracks.json', {
-      cache: 'force-cache', // Use browser cache
+      cache: 'no-store',
     })
     
     if (!response.ok) {

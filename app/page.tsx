@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, Play, Heart, Clock, Sparkles } from 'lucide-react'
 import Header from '@/components/Header'
@@ -35,6 +35,10 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   
   const { recentTracks, favoriteTracks, currentTrack, initializeAudio } = usePlayer()
+
+  const stateOptions = useMemo(() => {
+    return Array.from(new Set(tracks.map(t => t.targetState))) as TargetState[]
+  }, [tracks])
 
   useEffect(() => {
     loadData()
@@ -159,7 +163,7 @@ export default function HomePage() {
               >
                 All
               </button>
-              {targetStates.map((state) => (
+              {stateOptions.map((state) => (
                 <button
                   key={state}
                   onClick={() => setSelectedState(state)}

@@ -180,9 +180,7 @@
       "gainDb": 0,
       "description": "MBT binaural beats: primarily 4Hz with brief 8Hz spikes and 2Hz dips; ~50 minutes; optimized 32–512Hz base tones."
     },
-
-    /* ---- NEW TECH-BB v1 (15 tracks) ---- */
-
+    
     {
       "id": "nv01-rv-primer-12to7p83",
       "title": "NV01 • RV Primer 12→7.83 Hz",

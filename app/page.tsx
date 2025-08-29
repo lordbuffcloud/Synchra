@@ -260,7 +260,7 @@ export default function HomePage() {
             </div>
             
             <div className="space-y-12">
-              {[...new Set(tracks.map(t => t.targetState))].map((state) => {
+              {Array.from(new Set(tracks.map(t => t.targetState))).map((state) => {
                 const stateTracks = getTracksByStateData(state)
                 if (stateTracks.length === 0) return null
                 

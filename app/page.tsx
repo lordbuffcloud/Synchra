@@ -11,7 +11,7 @@ import usePlayer from '@/store/usePlayer'
 
 const baseStateKeys = ['Focus', 'Deep Sleep', 'Lucid', 'Calm', 'Recovery', 'Custom'] as const
 type BaseState = typeof baseStateKeys[number]
-const targetStates: BaseState[] = baseStateKeys
+const targetStates: BaseState[] = [...baseStateKeys]
 
 const stateDescriptions: Record<BaseState, string> = {
   'Focus': 'Enhanced concentration and productivity',

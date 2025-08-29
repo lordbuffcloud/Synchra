@@ -10,7 +10,7 @@ interface TrackCardProps {
   className?: string
 }
 
-const stateColors: Record<TargetState, string> = {
+const stateColors: Partial<Record<TargetState, string>> = {
   'Focus': 'text-neon-blue',
   'Deep Sleep': 'text-purple-400',
   'Lucid': 'text-neon-purple',
@@ -19,7 +19,7 @@ const stateColors: Record<TargetState, string> = {
   'Custom': 'text-neon-green',
 }
 
-const stateIcons: Record<TargetState, any> = {
+const stateIcons: Partial<Record<TargetState, any>> = {
   'Focus': Zap,
   'Deep Sleep': () => <div className="w-4 h-4 rounded-full bg-purple-400/20 border border-purple-400/40" />,
   'Lucid': () => <div className="w-4 h-4 rounded-full bg-neon-purple/30 animate-pulse" />,
@@ -39,7 +39,7 @@ export default function TrackCard({ track, className = '' }: TrackCardProps) {
 
   const isCurrentTrack = currentTrack?.id === track.id
   const isFavorite = favoriteTracks.includes(track.id)
-  const StateIcon = stateIcons[track.targetState]
+  const StateIcon = stateIcons[track.targetState] || (() => <div className="w-4 h-4 rounded-full bg-primary/30 border border-primary/40" />)
 
   const handlePlay = async () => {
     try {
@@ -95,7 +95,7 @@ export default function TrackCard({ track, className = '' }: TrackCardProps) {
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center space-x-2">
             <StateIcon />
-            <span className={`text-sm font-medium ${stateColors[track.targetState]}`}>
+            <span className={`text-sm font-medium ${stateColors[track.targetState] || 'text-primary'}`}>
               {track.targetState}
             </span>
           </div>

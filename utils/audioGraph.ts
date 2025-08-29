@@ -1,8 +1,8 @@
 export class AudioGraph {
   private audioContext: AudioContext
-  private limiter: DynamicsCompressorNode
-  private masterGain: GainNode
-  private crossfader: CrossfadeNode
+  private limiter!: DynamicsCompressorNode
+  private masterGain!: GainNode
+  private crossfader!: CrossfadeNode
   
   constructor() {
     this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
@@ -72,9 +72,9 @@ export class AudioGraph {
 
 export class CrossfadeNode {
   private audioContext: AudioContext
-  private inputA: GainNode
-  private inputB: GainNode
-  private outputNode: GainNode
+  private inputA!: GainNode
+  private inputB!: GainNode
+  private outputNode!: GainNode
   private currentInput: 'A' | 'B' = 'A'
 
   constructor(audioContext: AudioContext) {

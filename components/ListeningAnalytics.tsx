@@ -64,7 +64,9 @@ export default function ListeningAnalytics() {
         
         // Find favorite state
         const favoriteState = Object.keys(stateBreakdown).length > 0 
-          ? Object.keys(stateBreakdown).reduce((a, b) => stateBreakdown[a as TargetState] > stateBreakdown[b as TargetState] ? a : b)
+          ? (Object.keys(stateBreakdown) as TargetState[]).reduce((a, b) => 
+              ((stateBreakdown[a] ?? 0) > (stateBreakdown[b] ?? 0) ? a : b)
+            )
           : 'Focus'
         
         // Frequency distribution

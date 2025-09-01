@@ -39,6 +39,9 @@ export interface PlayerState {
   activeMediaSlot: 'A' | 'B' | null
   rafId?: number | null
   
+  // Session tracking
+  sessionStartTime: number | null
+  
   // Actions
   initializeAudio: () => Promise<void>
   loadTrack: (track: Track) => Promise<void>
@@ -55,6 +58,7 @@ export interface PlayerState {
   addToFavorites: (trackId: string) => void
   removeFromFavorites: (trackId: string) => void
   addToRecent: (trackId: string) => void
+  trackSession: (trackId: string, startTime: number, endTime: number, targetState: string, beatHz?: number) => void
   reset: () => void
 }
 
@@ -84,6 +88,7 @@ const usePlayer = create<PlayerState>()(
       mediaB: null,
       activeMediaSlot: null,
       rafId: null,
+      sessionStartTime: null,
 
       initializeAudio: async () => {
         const { audioGraph } = get()
@@ -184,7 +189,10 @@ const usePlayer = create<PlayerState>()(
         const active = activeMediaSlot === 'A' ? mediaA : mediaB
         active.loop = !!loopEnabled
         await active.play()
-        set({ isPlaying: true })
+        
+        // Start session tracking
+        const sessionStart = Date.now()
+        set({ isPlaying: true, sessionStartTime: sessionStart })
 
         if (timerMinutes && !get().timerStartTime) {
           set({ timerStartTime: Date.now() })
@@ -205,11 +213,27 @@ const usePlayer = create<PlayerState>()(
       },
 
       pause: () => {
-        const { mediaA, mediaB, rafId } = get()
+        const { mediaA, mediaB, rafId, sessionStartTime, currentTrack } = get()
         if (rafId) cancelAnimationFrame(rafId)
         if (mediaA) mediaA.pause()
         if (mediaB) mediaB.pause()
-        set({ isPlaying: false, rafId: null })
+        
+        // Track session if it was long enough (>30 seconds)
+        if (sessionStartTime && currentTrack) {
+          const sessionEnd = Date.now()
+          const duration = (sessionEnd - sessionStartTime) / 1000
+          if (duration > 30) {
+            get().trackSession(
+              currentTrack.id,
+              sessionStartTime,
+              sessionEnd,
+              currentTrack.targetState,
+              currentTrack.beatHz
+            )
+          }
+        }
+        
+        set({ isPlaying: false, rafId: null, sessionStartTime: null })
       },
 
       seek: (time: number) => {
@@ -289,8 +313,41 @@ const usePlayer = create<PlayerState>()(
         }))
       },
 
+      trackSession: (trackId: string, startTime: number, endTime: number, targetState: string, beatHz?: number) => {
+        const sessions = JSON.parse(localStorage.getItem('synchra-sessions') || '[]')
+        const newSession = {
+          id: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          trackId,
+          startTime,
+          endTime,
+          duration: (endTime - startTime) / 1000, // seconds
+          targetState,
+          beatHz
+        }
+        sessions.push(newSession)
+        
+        // Keep only last 1000 sessions to prevent storage bloat
+        const trimmedSessions = sessions.slice(-1000)
+        localStorage.setItem('synchra-sessions', JSON.stringify(trimmedSessions))
+      },
+
       reset: () => {
-        const { currentSource, audioGraph, noiseGenerator } = get()
+        const { currentSource, audioGraph, noiseGenerator, sessionStartTime, currentTrack } = get()
+        
+        // Track final session if active
+        if (sessionStartTime && currentTrack) {
+          const sessionEnd = Date.now()
+          const duration = (sessionEnd - sessionStartTime) / 1000
+          if (duration > 30) {
+            get().trackSession(
+              currentTrack.id,
+              sessionStartTime,
+              sessionEnd,
+              currentTrack.targetState,
+              currentTrack.beatHz
+            )
+          }
+        }
         
         if (currentSource) {
           currentSource.stop()
@@ -308,6 +365,7 @@ const usePlayer = create<PlayerState>()(
           duration: 0,
           currentSource: null,
           timerStartTime: null,
+          sessionStartTime: null,
         })
       },
     }),

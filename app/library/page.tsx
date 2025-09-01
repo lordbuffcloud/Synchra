@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { Search, Filter, Heart, Clock, Download, Trash2, RefreshCw } from 'lucide-react'
 import Header from '@/components/Header'
 import TrackCard from '@/components/TrackCard'
+import ListeningAnalytics from '@/components/ListeningAnalytics'
 import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manifest'
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
@@ -277,6 +278,9 @@ function LibraryPageClient() {
             </div>
           </div>
         )}
+
+        {/* Analytics */}
+        <ListeningAnalytics />
 
         {/* Controls */}
         <div className="space-y-4 mb-8">

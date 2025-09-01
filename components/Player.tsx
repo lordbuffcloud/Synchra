@@ -135,6 +135,8 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
   const [showSettings, setShowSettings] = useState(false)
   const [peaks, setPeaks] = useState<number[]>([])
   const [customTimerInput, setCustomTimerInput] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
   
   const track = currentTrack || initialTrack
 
@@ -187,6 +189,44 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [isPlaying, currentTime, duration, volume, showSettings])
+
+  // Touch gestures for mobile
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.target instanceof HTMLElement && !e.target.closest('.player-container')) return
+      setTouchStartY(e.touches[0].clientY)
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStartY || isDragging) return
+      
+      const touchY = e.touches[0].clientY
+      const deltaY = touchStartY - touchY
+      
+      // Volume control via vertical swipe (minimum 50px movement)
+      if (Math.abs(deltaY) > 50) {
+        e.preventDefault()
+        const volumeChange = deltaY / 200 // Sensitivity adjustment
+        const newVolume = Math.max(0, Math.min(1, volume + volumeChange))
+        setVolume(newVolume)
+        setTouchStartY(touchY) // Update for continuous swiping
+      }
+    }
+
+    const handleTouchEnd = () => {
+      setTouchStartY(null)
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('touchend', handleTouchEnd)
+    
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [touchStartY, volume, isDragging])
 
   const handlePlayPause = async () => {
     if (!track) return
@@ -258,23 +298,23 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
   }
 
   return (
-    <div className={`bg-card rounded-xl p-8 ${className}`}>
+    <div className={`player-container bg-card rounded-xl p-4 sm:p-8 ${className} select-none`}>
       {/* Track Info */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold mb-2">{track.title}</h2>
-        <p className="text-muted-foreground mb-2">{track.description}</p>
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-2 leading-tight px-2">{track.title}</h2>
+        <p className="text-muted-foreground mb-2 text-sm sm:text-base px-2 line-clamp-2">{track.description}</p>
         
         {track.beatHz && (
-          <div className="flex items-center justify-center space-x-4 text-sm">
-            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full font-mono">
+          <div className="flex items-center justify-center flex-wrap gap-2 text-sm px-2">
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full font-mono text-xs sm:text-sm">
               {track.beatHz}Hz
             </span>
             {band && (
-              <span className="px-3 py-1 bg-muted/50 rounded-full capitalize">
+              <span className="px-3 py-1 bg-muted/50 rounded-full capitalize text-xs sm:text-sm">
                 {band} waves
               </span>
             )}
-            <span className="px-3 py-1 bg-accent/10 text-accent rounded-full">
+            <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-xs sm:text-sm">
               {track.targetState}
             </span>
           </div>
@@ -282,27 +322,27 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
       </div>
 
       {/* Main Player Controls */}
-      <div className="flex items-center justify-center mb-8">
+      <div className="flex items-center justify-center mb-6 sm:mb-8">
         <div className="relative">
           <ProgressRing 
             progress={progress} 
             peaks={peaks}
-            size={240}
+            size={window.innerWidth < 640 ? 200 : 240}
           />
           
           {/* Center Play Button */}
           <button
             onClick={handlePlayPause}
             disabled={isLoading}
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center touch-manipulation"
           >
-            <div className="w-16 h-16 bg-primary hover:bg-primary/90 rounded-full flex items-center justify-center transition-all micro-motion disabled:opacity-50">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary hover:bg-primary/90 active:scale-95 rounded-full flex items-center justify-center transition-all micro-motion disabled:opacity-50">
               {isLoading ? (
-                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-8 h-8 text-primary-foreground" fill="currentColor" />
+                <Pause className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" fill="currentColor" />
               ) : (
-                <Play className="w-8 h-8 text-primary-foreground ml-1" fill="currentColor" />
+                <Play className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground ml-0.5 sm:ml-1" fill="currentColor" />
               )}
             </div>
           </button>
@@ -322,10 +362,10 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
       </div>
 
       {/* Secondary Controls */}
-      <div className="flex items-center justify-center space-x-6 mb-6">
+      <div className="flex items-center justify-center space-x-4 sm:space-x-6 mb-6">
         <button
           onClick={() => seek(Math.max(0, currentTime - 10))}
-          className="p-2 text-muted-foreground hover:text-foreground transition-colors focus-ring rounded-lg"
+          className="p-3 sm:p-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all focus-ring rounded-lg touch-manipulation"
           title="Rewind 10s"
         >
           <SkipBack className="w-5 h-5" />
@@ -333,7 +373,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
 
         <button
           onClick={handleFavoriteToggle}
-          className={`p-2 transition-colors focus-ring rounded-lg ${
+          className={`p-3 sm:p-2 transition-all active:scale-95 focus-ring rounded-lg touch-manipulation ${
             isFavorite ? 'text-red-400 hover:text-red-300' : 'text-muted-foreground hover:text-foreground'
           }`}
           title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -343,7 +383,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
 
         <button
           onClick={() => setLoopEnabled(!loopEnabled)}
-          className={`p-2 transition-colors focus-ring rounded-lg ${
+          className={`p-3 sm:p-2 transition-all active:scale-95 focus-ring rounded-lg touch-manipulation ${
             loopEnabled ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
           title="Toggle loop"
@@ -353,7 +393,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
 
         <button
           onClick={() => seek(Math.min(duration, currentTime + 10))}
-          className="p-2 text-muted-foreground hover:text-foreground transition-colors focus-ring rounded-lg"
+          className="p-3 sm:p-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all focus-ring rounded-lg touch-manipulation"
           title="Forward 10s"
         >
           <SkipForward className="w-5 h-5" />
@@ -361,9 +401,9 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
       </div>
 
       {/* Volume Control */}
-      <div className="flex items-center space-x-4 mb-6">
-        <Volume2 className="w-5 h-5 text-muted-foreground" />
-        <div className="flex-1">
+      <div className="flex items-center space-x-3 sm:space-x-4 mb-6 px-2">
+        <Volume2 className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+        <div className="flex-1 relative">
           <input
             type="range"
             min="0"
@@ -371,10 +411,15 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
             step="0.01"
             value={volume}
             onChange={(e) => setVolume(parseFloat(e.target.value))}
-            className="w-full"
+            onTouchStart={() => setIsDragging(true)}
+            onTouchEnd={() => setIsDragging(false)}
+            className="w-full h-8 sm:h-6 appearance-none bg-muted rounded-lg cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${volume * 100}%, hsl(var(--muted)) ${volume * 100}%, hsl(var(--muted)) 100%)`
+            }}
           />
         </div>
-        <span className="text-sm text-muted-foreground font-mono w-12">
+        <span className="text-sm text-muted-foreground font-mono w-10 sm:w-12 text-right">
           {Math.round(volume * 100)}%
         </span>
       </div>
@@ -392,6 +437,31 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
           </button>
         </div>
       )}
+
+      {/* Keyboard Shortcuts Help - Hidden on mobile */}
+      <div className="hidden sm:flex items-center justify-center space-x-4 text-xs text-muted-foreground mb-4">
+        <div className="flex items-center space-x-1">
+          <kbd className="px-2 py-1 bg-muted rounded text-xs">Space</kbd>
+          <span>Play/Pause</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <kbd className="px-2 py-1 bg-muted rounded text-xs">↑↓</kbd>
+          <span>Volume</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <kbd className="px-2 py-1 bg-muted rounded text-xs">←→</kbd>
+          <span>Seek</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <kbd className="px-2 py-1 bg-muted rounded text-xs">T</kbd>
+          <span>Settings</span>
+        </div>
+      </div>
+      
+      {/* Mobile Gesture Hint */}
+      <div className="sm:hidden text-center text-xs text-muted-foreground mb-4 px-4">
+        <span>👆 Swipe up/down anywhere to adjust volume</span>
+      </div>
 
       {/* Settings Toggle */}
       <div className="flex items-center justify-center">

@@ -53,26 +53,35 @@ def make_silence(seconds:float, out_wav:str):
          "-c:a","pcm_s16le", out_wav])
 
 def concat_wavs(wavs, out_wav):
-    with tempfile.NamedTemporaryFile("w", delete=False, suffix=".txt") as lst:
-        for w in wavs: lst.write(f"file '{pathlib.Path(w).as_posix()}'\n")
+    import pathlib, tempfile
+    # Use ABSOLUTE, POSIX-style paths so ffmpeg can find files from a temp list file
+    with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8", suffix=".txt") as lst:
+        for w in wavs:
+            p = pathlib.Path(w).resolve().as_posix()
+            lst.write(f"file '{p}'\n")
         listpath = lst.name
     run(["ffmpeg","-y",*FFERR,"-f","concat","-safe","0","-i",listpath,"-c","copy",out_wav])
     os.remove(listpath)
+
 
 def sidechain_mix(bg_path, vo_path, out_stem):
     out_webm = f"{out_stem}.webm"
     out_m4a  = f"{out_stem}.m4a"
     run([
-        "ffmpeg","-y",*FFERR,"-i",bg_path,"-i",vo_path,
+        "ffmpeg","-y","-hide_banner","-loglevel","error",
+        "-i",bg_path,"-i",vo_path,
         "-filter_complex",
+        # HPF + de-ess + normalize VO  → duck BG by VO → mix → LIMIT FINAL BUS to ~ -1 dBFS
         "[0:a]volume=1.0[bg];"
-        "[1:a]highpass=f=80,deesser=i=12:s=0.5,dynaudnorm=f=200:g=5,alimiter=limit=-1.0[vo];"
+        "[1:a]highpass=f=80,deesser=i=0.3,dynaudnorm=f=200:g=5[vo];"
         "[bg][vo]sidechaincompress=threshold=-28dB:ratio=6:attack=25:release=300:makeup=3[duck];"
-        "[duck][vo]amix=inputs=2:normalize=0[a]",
+        "[duck][vo]amix=inputs=2:normalize=0[mix];"
+        "[mix]alimiter=limit=0.891[a]",  # 0.891 ≈ -1.0 dBFS linear
         "-map","[a]","-c:a","libopus","-b:a","160k", out_webm
     ])
-    run(["ffmpeg","-y",*FFERR,"-i",out_webm,"-c:a","aac","-b:a","192k","-movflags","+faststart",out_m4a])
+    run(["ffmpeg","-y","-hide_banner","-loglevel","error","-i",out_webm,"-c:a","aac","-b:a","192k","-movflags","+faststart",out_m4a])
     return out_webm, out_m4a
+
 
 def ensure_bed_length(bed_path, minutes:int):
     """If bed duration already matches minutes, return as-is.
@@ -110,7 +119,7 @@ def ensure_bed_length(bed_path, minutes:int):
 
 def build_one(title, bed, minutes, voice_id, suffix):
     # pick bed file (prefer m4a to dodge bad webm headers)
-    bed_src = bed if os.path.exists(bed) else bed.replace(".webm",".m4a")
+    bed_src = (bed.replace(".webm",".m4a") if os.path.exists(bed.replace(".webm",".m4a")) else bed)
     if not os.path.exists(bed_src):
         raise FileNotFoundError(f"Missing bed: {bed}")
     bed_long = ensure_bed_length(bed_src, minutes)
@@ -234,3 +243,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

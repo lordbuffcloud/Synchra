@@ -1,12 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app:*)",
-      "Bash(npm create:*)",
-      "Bash(dir)",
-      "Bash(find:*)",
-      "Bash(del \"C:\\Users\\lordb\\synchra\\public\\tracks\\*.mp3\")",
-      "Bash(del \"*.mp3\")"
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck:*)",
+      "Read(\\c\\users\\lordb/**)",
+      "Bash(npx next lint:*)",
+      "Bash(powershell:*)",
+      "Bash(cmd /c:*)"
     ],
     "deny": [],
     "ask": []

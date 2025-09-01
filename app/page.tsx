@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, Play, Heart, Clock, Sparkles } from 'lucide-react'
+import { Search, Play, Heart, Clock, Sparkles, Filter, SlidersHorizontal } from 'lucide-react'
 import Header from '@/components/Header'
 import TrackCard from '@/components/TrackCard'
+import SessionStats from '@/components/SessionStats'
+import RecommendationsWidget from '@/components/RecommendationsWidget'
+import AdvancedSearchModal from '@/components/AdvancedSearchModal'
 import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manifest'
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
@@ -33,6 +36,9 @@ export default function HomePage() {
   const [selectedState, setSelectedState] = useState<TargetState | 'All'>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
+  const [hasAdvancedFilters, setHasAdvancedFilters] = useState(false)
+  const [searchResultsCount, setSearchResultsCount] = useState<number | null>(null)
   
   const { recentTracks, favoriteTracks, currentTrack, initializeAudio } = usePlayer()
 
@@ -112,50 +118,88 @@ export default function HomePage() {
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+        <section className="text-center mb-8 sm:mb-12 px-2">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
             <span className="bg-neon-gradient bg-clip-text text-transparent">
               Tune Probability
             </span>
             <br />
             <span className="text-foreground">With Precision Audio</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Harness binaural beats for focus, relaxation, and consciousness exploration. 
             Science-backed frequencies for modern minds.
           </p>
           
           {currentTrack && (
-            <div className="mt-6 inline-flex items-center space-x-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm">
-              <Play className="h-4 w-4 text-primary animate-pulse" />
-              <span>Playing: {currentTrack.title}</span>
-              <Link href={`/player/${currentTrack.id}`} className="text-primary hover:underline">
+            <div className="mt-6 inline-flex items-center space-x-2 px-3 sm:px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-xs sm:text-sm max-w-full">
+              <Play className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse flex-shrink-0" />
+              <span className="truncate">Playing: {currentTrack.title}</span>
+              <Link href={`/player/${currentTrack.id}`} className="text-primary hover:underline whitespace-nowrap">
                 Go to Player →
               </Link>
             </div>
           )}
         </section>
 
+        {/* Session Stats */}
+        <SessionStats />
+
+        {/* Recommendations */}
+        <RecommendationsWidget />
+
         {/* Search and Filters */}
-        <section className="mb-8">
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search tracks, states, or frequencies..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus-ring"
-              />
+        <section className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 mb-6">
+            {/* Search Row */}
+            <div className="flex gap-3">
+              {/* Search */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search tracks, states, frequencies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-12 py-3 sm:py-3 text-sm sm:text-base bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus-ring"
+                />
+                <button
+                  onClick={() => setShowAdvancedSearch(true)}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors touch-manipulation ${
+                    hasAdvancedFilters 
+                      ? 'text-primary bg-primary/10' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Advanced search"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                </button>
+              </div>
+              
+              {/* Quick Filters Button */}
+              <button
+                onClick={() => setShowAdvancedSearch(true)}
+                className={`flex items-center space-x-2 px-3 sm:px-4 py-3 border border-border rounded-lg transition-colors whitespace-nowrap touch-manipulation ${
+                  hasAdvancedFilters
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card hover:bg-muted/50'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                <span className="hidden sm:inline">Filters</span>
+                {hasAdvancedFilters && (
+                  <span className="bg-primary-foreground text-primary text-xs px-1.5 py-0.5 rounded-full font-medium">
+                    •
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* State Filter */}
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 sm:pb-0">
+            <div className="flex items-center space-x-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
               <button
                 onClick={() => setSelectedState('All')}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
                   selectedState === 'All'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground hover:text-foreground'
@@ -167,7 +211,7 @@ export default function HomePage() {
                 <button
                   key={state}
                   onClick={() => setSelectedState(state)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
                     selectedState === state
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:text-foreground'
@@ -182,14 +226,14 @@ export default function HomePage() {
 
         {/* Recent Tracks */}
         {!searchQuery && selectedState === 'All' && recentTracks.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold flex items-center space-x-2">
-                <Clock className="h-6 w-6 text-primary" />
+          <section className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 px-2 sm:px-0">
+              <h3 className="text-xl sm:text-2xl font-semibold flex items-center space-x-2">
+                <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 <span>Continue Listening</span>
               </h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {getRecentTracksData().slice(0, 4).map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
@@ -199,20 +243,20 @@ export default function HomePage() {
 
         {/* Favorites */}
         {!searchQuery && selectedState === 'All' && favoriteTracks.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold flex items-center space-x-2">
-                <Heart className="h-6 w-6 text-red-400" />
+          <section className="mb-8 sm:mb-12">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 px-2 sm:px-0">
+              <h3 className="text-xl sm:text-2xl font-semibold flex items-center space-x-2">
+                <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-red-400" />
                 <span>Favorites</span>
               </h3>
               <Link 
                 href="/library?filter=favorites"
-                className="text-primary hover:underline text-sm"
+                className="text-primary hover:underline text-xs sm:text-sm"
               >
                 View all →
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {getFavoriteTracksData().slice(0, 4).map((track) => (
                 <TrackCard key={track.id} track={track} />
               ))}
@@ -225,12 +269,28 @@ export default function HomePage() {
           // Search Results or Filtered Results
           <section>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold">
-                {searchQuery ? `Search Results for "${searchQuery}"` : `${selectedState} Tracks`}
-              </h3>
-              <span className="text-sm text-muted-foreground">
-                {filteredTracks.length} track{filteredTracks.length !== 1 ? 's' : ''}
-              </span>
+              <div>
+                <h3 className="text-2xl font-semibold">
+                  {searchQuery ? `Search Results` : `${selectedState} Tracks`}
+                </h3>
+                {searchQuery && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    for "{searchQuery}"
+                    {hasAdvancedFilters && ' with filters applied'}
+                  </p>
+                )}
+              </div>
+              <div className="text-right">
+                <span className="text-sm text-muted-foreground">
+                  {searchResultsCount !== null ? searchResultsCount : filteredTracks.length} track{(searchResultsCount !== null ? searchResultsCount : filteredTracks.length) !== 1 ? 's' : ''}
+                </span>
+                {hasAdvancedFilters && (
+                  <div className="text-xs text-primary mt-1 flex items-center justify-end space-x-1">
+                    <Filter className="w-3 h-3" />
+                    <span>Filtered</span>
+                  </div>
+                )}
+              </div>
             </div>
             
             {filteredTracks.length === 0 ? (
@@ -242,7 +302,7 @@ export default function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {filteredTracks.map((track) => (
                   <TrackCard key={track.id} track={track} />
                 ))}
@@ -311,6 +371,30 @@ export default function HomePage() {
             </Link>
           </section>
         )}
+        
+        {/* Advanced Search Modal */}
+        <AdvancedSearchModal
+          isOpen={showAdvancedSearch}
+          onClose={() => setShowAdvancedSearch(false)}
+          onApplyFilters={(filters, results) => {
+            setFilteredTracks(results)
+            setSearchResultsCount(results.length)
+            setHasAdvancedFilters(
+              filters.targetStates.length > 0 ||
+              filters.tags.length > 0 ||
+              filters.frequencyRange[0] !== 0.5 ||
+              filters.frequencyRange[1] !== 100 ||
+              filters.durationRange[0] !== 1 ||
+              filters.durationRange[1] !== 180 ||
+              filters.sortBy !== 'relevance'
+            )
+            if (filters.query) {
+              setSearchQuery(filters.query)
+            }
+            setSelectedState('All')
+          }}
+          initialFilters={{ query: searchQuery }}
+        />
       </main>
     </div>
   )

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ffmpeg:*)",
+      "Bash(python:*)",
+      "Bash(\"/c/Users/lordb/AppData/Local/Programs/Python/Python312/python.exe\" generate_app_tracks.py)",
+      "Bash(where:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

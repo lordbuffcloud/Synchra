@@ -23,7 +23,7 @@ interface Analytics {
   favoriteState: string
   favoriteFrequency: number
   streakDays: number
-  stateBreakdown: Record<TargetState, number> // minutes per state
+  stateBreakdown: Partial<Record<TargetState, number>> // minutes per state
   frequencyDistribution: Record<string, number> // minutes per frequency range
   weeklyTrend: number[] // minutes per day for last 7 days
 }
@@ -57,7 +57,7 @@ export default function ListeningAnalytics() {
         const avgLength = filteredSessions.length > 0 ? totalTime / filteredSessions.length : 0
         
         // State breakdown
-        const stateBreakdown: Record<TargetState, number> = {}
+        const stateBreakdown: Partial<Record<TargetState, number>> = {}
         filteredSessions.forEach(session => {
           stateBreakdown[session.targetState] = (stateBreakdown[session.targetState] || 0) + (session.duration / 60)
         })

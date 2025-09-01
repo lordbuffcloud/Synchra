@@ -129,7 +129,9 @@ export default function RecommendationsWidget() {
             }
             
             // Frequency preference (if user has pattern)
-            const favoriteFreqs = favoriteTrackObjects.map(t => t.beatHz).filter(Boolean)
+            const favoriteFreqs = favoriteTrackObjects
+              .map(t => t.beatHz)
+              .filter((n): n is number => typeof n === 'number')
             if (favoriteFreqs.length > 0 && track.beatHz) {
               const avgFavoriteFreq = favoriteFreqs.reduce((a, b) => a + b, 0) / favoriteFreqs.length
               const freqDistance = Math.abs(track.beatHz - avgFavoriteFreq)

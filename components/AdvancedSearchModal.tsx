@@ -60,7 +60,9 @@ export default function AdvancedSearchModal({
         setAvailableStates(states)
         
         // Set frequency range based on available tracks
-        const frequencies = manifest.tracks.map(t => t.beatHz).filter(Boolean)
+        const frequencies = manifest.tracks
+          .map(t => t.beatHz)
+          .filter((n): n is number => typeof n === 'number')
         if (frequencies.length > 0) {
           const minFreq = Math.min(...frequencies)
           const maxFreq = Math.max(...frequencies)

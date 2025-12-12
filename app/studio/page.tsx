@@ -6,6 +6,15 @@ import usePlayer from '@/store/usePlayer'
 import { BinauralBeatSynth, BinauralPreset } from '@/utils/binauralSynth'
 import { Play, Pause, Headphones, Waves, Sparkles } from 'lucide-react'
 
+type NoiseTypeOption = 'pink' | 'brown' | 'white' | null
+
+const NOISE_OPTIONS: Array<{ type: NoiseTypeOption; label: string }> = [
+  { type: null, label: 'Off' },
+  { type: 'pink', label: 'Pink' },
+  { type: 'brown', label: 'Brown' },
+  { type: 'white', label: 'White' },
+]
+
 const PRESETS: BinauralPreset[] = [
   {
     id: 'nv-schumann-7p83',
@@ -230,12 +239,7 @@ export default function StudioPage() {
               </h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                {[
-                  { type: null as const, label: 'Off' },
-                  { type: 'pink' as const, label: 'Pink' },
-                  { type: 'brown' as const, label: 'Brown' },
-                  { type: 'white' as const, label: 'White' },
-                ].map(({ type, label }) => (
+                {NOISE_OPTIONS.map(({ type, label }) => (
                   <button
                     key={label}
                     onClick={() => setNoiseType(type)}

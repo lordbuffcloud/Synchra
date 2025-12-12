@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Music, Settings, Library, Info } from 'lucide-react'
+import { Music, Settings, Library, Info, Sparkles } from 'lucide-react'
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Synchra'
 
@@ -48,6 +48,14 @@ export default function Header() {
             >
               <Library className="h-4 w-4" />
               <span className="hidden sm:inline">Library</span>
+            </Link>
+
+            <Link
+              href="/studio"
+              className="flex items-center space-x-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-ring rounded-lg"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Studio</span>
             </Link>
             
             <Link

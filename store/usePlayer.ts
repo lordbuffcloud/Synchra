@@ -20,6 +20,7 @@ export interface PlayerState {
   // Timer
   timerMinutes: number | null
   timerStartTime: number | null
+  timerTimeoutId: number | null
   
   // Noise layer
   noiseType: 'pink' | 'brown' | 'white' | null
@@ -32,10 +33,15 @@ export interface PlayerState {
   // Audio system
   audioGraph: AudioGraph | null
   noiseGenerator: NoiseGenerator | null
+  noiseBus: GainNode | null
+  noiseAmLfo?: OscillatorNode | null
+  noiseAmGain?: GainNode | null
   currentSource: AudioBufferSourceNode | null
   // Streaming media elements for byte-range playback
   mediaA: HTMLAudioElement | null
   mediaB: HTMLAudioElement | null
+  mediaGainA: GainNode | null
+  mediaGainB: GainNode | null
   activeMediaSlot: 'A' | 'B' | null
   rafId?: number | null
   
@@ -77,15 +83,21 @@ const usePlayer = create<PlayerState>()(
       loopEnabled: false,
       timerMinutes: null,
       timerStartTime: null,
+      timerTimeoutId: null,
       noiseType: null,
       noiseVolume: 0.2,
       recentTracks: [],
       favoriteTracks: [],
       audioGraph: null,
       noiseGenerator: null,
+      noiseBus: null,
+      noiseAmLfo: null,
+      noiseAmGain: null,
       currentSource: null,
       mediaA: null,
       mediaB: null,
+      mediaGainA: null,
+      mediaGainB: null,
       activeMediaSlot: null,
       rafId: null,
       sessionStartTime: null,
@@ -97,8 +109,11 @@ const usePlayer = create<PlayerState>()(
         const graph = new AudioGraph()
         const noiseGen = new NoiseGenerator(graph.getContext())
         
-        // Connect noise generator to master output
-        noiseGen.connect(graph.getMasterGain())
+        // Noise bus enables future modulation without affecting the main program material.
+        const noiseBus = graph.getContext().createGain()
+        noiseBus.gain.value = 1
+        noiseBus.connect(graph.getMasterGain())
+        noiseGen.connect(noiseBus)
 
         // Create two persistent media elements and connect to crossfader inputs
         const mediaA = new Audio()
@@ -110,10 +125,28 @@ const usePlayer = create<PlayerState>()(
 
         const sourceA = graph.createMediaElementSource(mediaA)
         const sourceB = graph.createMediaElementSource(mediaB)
-        sourceA.connect(graph.getCrossfader().getInputA())
-        sourceB.connect(graph.getCrossfader().getInputB())
+
+        // Per-slot gain enables track-level normalization (LUFS adjustment).
+        const mediaGainA = graph.getContext().createGain()
+        const mediaGainB = graph.getContext().createGain()
+        mediaGainA.gain.value = 1
+        mediaGainB.gain.value = 1
+
+        sourceA.connect(mediaGainA)
+        sourceB.connect(mediaGainB)
+        mediaGainA.connect(graph.getCrossfader().getInputA())
+        mediaGainB.connect(graph.getCrossfader().getInputB())
         
-        set({ audioGraph: graph, noiseGenerator: noiseGen, mediaA, mediaB, activeMediaSlot: null })
+        set({
+          audioGraph: graph,
+          noiseGenerator: noiseGen,
+          noiseBus,
+          mediaA,
+          mediaB,
+          mediaGainA,
+          mediaGainB,
+          activeMediaSlot: null,
+        })
       },
 
       loadTrack: async (track: Track) => {
@@ -153,6 +186,16 @@ const usePlayer = create<PlayerState>()(
 
           // Update duration from the newly loaded media
           set({ duration: targetEl.duration || track.durationSec, isLoading: false })
+
+          // Apply LUFS normalization (track-level gain) if enabled and metadata is present.
+          const { normalizeEnabled, mediaGainA, mediaGainB } = get()
+          const gainDb = normalizeEnabled ? (track.gainDb || 0) : 0
+          const linearGain = gainDb ? Math.pow(10, gainDb / 20) : 1
+          const now = audioGraph!.getContext().currentTime
+          const targetGain = targetSlot === 'A' ? mediaGainA : mediaGainB
+          if (targetGain) {
+            targetGain.gain.setTargetAtTime(linearGain, now, 0.05)
+          }
 
           if (!activeMediaSlot) {
             // First load: set active slot but do not auto-play
@@ -195,11 +238,11 @@ const usePlayer = create<PlayerState>()(
         set({ isPlaying: true, sessionStartTime: sessionStart })
 
         if (timerMinutes && !get().timerStartTime) {
-          set({ timerStartTime: Date.now() })
-          setTimeout(() => {
+          const timeoutId = window.setTimeout(() => {
             get().pause()
-            set({ timerStartTime: null })
+            set({ timerStartTime: null, timerTimeoutId: null })
           }, timerMinutes * 60 * 1000)
+          set({ timerStartTime: Date.now(), timerTimeoutId: timeoutId })
         }
 
         const step = () => {
@@ -213,10 +256,14 @@ const usePlayer = create<PlayerState>()(
       },
 
       pause: () => {
-        const { mediaA, mediaB, rafId, sessionStartTime, currentTrack } = get()
+        const { mediaA, mediaB, rafId, sessionStartTime, currentTrack, timerTimeoutId } = get()
         if (rafId) cancelAnimationFrame(rafId)
         if (mediaA) mediaA.pause()
         if (mediaB) mediaB.pause()
+
+        if (timerTimeoutId) {
+          window.clearTimeout(timerTimeoutId)
+        }
         
         // Track session if it was long enough (>30 seconds)
         if (sessionStartTime && currentTrack) {
@@ -233,7 +280,7 @@ const usePlayer = create<PlayerState>()(
           }
         }
         
-        set({ isPlaying: false, rafId: null, sessionStartTime: null })
+        set({ isPlaying: false, rafId: null, sessionStartTime: null, timerTimeoutId: null })
       },
 
       seek: (time: number) => {
@@ -261,6 +308,14 @@ const usePlayer = create<PlayerState>()(
 
       setNormalizeEnabled: (enabled: boolean) => {
         set({ normalizeEnabled: enabled })
+        // Re-apply normalization to the currently loaded track slot if possible.
+        const { audioGraph, currentTrack, activeMediaSlot, mediaGainA, mediaGainB } = get()
+        if (!audioGraph || !currentTrack || !activeMediaSlot) return
+        const gainDb = enabled ? (currentTrack.gainDb || 0) : 0
+        const linearGain = gainDb ? Math.pow(10, gainDb / 20) : 1
+        const now = audioGraph.getContext().currentTime
+        const g = activeMediaSlot === 'A' ? mediaGainA : mediaGainB
+        if (g) g.gain.setTargetAtTime(linearGain, now, 0.05)
       },
 
       setLoopEnabled: (enabled: boolean) => {
@@ -268,7 +323,11 @@ const usePlayer = create<PlayerState>()(
       },
 
       setTimer: (minutes: number | null) => {
-        set({ timerMinutes: minutes, timerStartTime: null })
+        const { timerTimeoutId } = get()
+        if (timerTimeoutId) {
+          window.clearTimeout(timerTimeoutId)
+        }
+        set({ timerMinutes: minutes, timerStartTime: null, timerTimeoutId: null })
       },
 
       setNoiseType: (type: 'pink' | 'brown' | 'white' | null) => {
@@ -332,7 +391,7 @@ const usePlayer = create<PlayerState>()(
       },
 
       reset: () => {
-        const { currentSource, audioGraph, noiseGenerator, sessionStartTime, currentTrack } = get()
+        const { currentSource, audioGraph, noiseGenerator, sessionStartTime, currentTrack, timerTimeoutId } = get()
         
         // Track final session if active
         if (sessionStartTime && currentTrack) {
@@ -357,6 +416,10 @@ const usePlayer = create<PlayerState>()(
           noiseGenerator.stop()
         }
 
+        if (timerTimeoutId) {
+          window.clearTimeout(timerTimeoutId)
+        }
+
         set({
           currentTrack: null,
           isPlaying: false,
@@ -365,6 +428,7 @@ const usePlayer = create<PlayerState>()(
           duration: 0,
           currentSource: null,
           timerStartTime: null,
+          timerTimeoutId: null,
           sessionStartTime: null,
         })
       },

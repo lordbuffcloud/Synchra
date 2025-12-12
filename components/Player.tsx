@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Repeat, Timer, Settings, Waves } from 'lucide-react'
 import usePlayer from '@/store/usePlayer'
 import { Track } from '@/types/track'
@@ -17,7 +17,17 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-function ProgressRing({ progress, peaks, size = 200 }: { progress: number; peaks?: number[]; size?: number }) {
+function ProgressRing({
+  progress,
+  peaks,
+  size = 200,
+  className = '',
+}: {
+  progress: number
+  peaks?: number[]
+  size?: number
+  className?: string
+}) {
   const strokeWidth = 8
   const radius = (size - strokeWidth) / 2
   const circumference = radius * 2 * Math.PI
@@ -25,7 +35,7 @@ function ProgressRing({ progress, peaks, size = 200 }: { progress: number; peaks
   const strokeDashoffset = circumference - (progress / 100) * circumference
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
+    <div className={`relative ${className}`} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
         {/* Background circle */}
         <circle
@@ -143,6 +153,8 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
   const isFavorite = track ? favoriteTracks.includes(track.id) : false
 
+  const ringSize = useMemo(() => 240, [])
+
   // Load peaks data
   useEffect(() => {
     if (track?.peaksPath) {
@@ -188,7 +200,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [isPlaying, currentTime, duration, volume, showSettings])
+  }, [isPlaying, currentTime, duration, volume, showSettings, pause, play, seek, setVolume])
 
   // Touch gestures for mobile
   useEffect(() => {
@@ -327,14 +339,23 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
           <ProgressRing 
             progress={progress} 
             peaks={peaks}
-            size={window.innerWidth < 640 ? 200 : 240}
+            size={ringSize}
+            className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px]"
           />
           
+          {/* Seekable overlay (behind the play button) */}
+          <button
+            type="button"
+            aria-label="Seek"
+            className="absolute inset-0 z-0 cursor-pointer rounded-full"
+            onClick={handleSeek}
+          />
+
           {/* Center Play Button */}
           <button
             onClick={handlePlayPause}
             disabled={isLoading}
-            className="absolute inset-0 flex items-center justify-center touch-manipulation"
+            className="absolute inset-0 z-10 flex items-center justify-center touch-manipulation"
           >
             <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary hover:bg-primary/90 active:scale-95 rounded-full flex items-center justify-center transition-all micro-motion disabled:opacity-50">
               {isLoading ? (
@@ -346,12 +367,6 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
               )}
             </div>
           </button>
-
-          {/* Seekable overlay */}
-          <div 
-            className="absolute inset-0 cursor-pointer"
-            onClick={handleSeek}
-          />
         </div>
       </div>
 

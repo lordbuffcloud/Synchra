@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, Play, Heart, Clock, Sparkles, Filter, SlidersHorizontal } from 'lucide-react'
 import Header from '@/components/Header'
@@ -8,7 +8,6 @@ import TrackCard from '@/components/TrackCard'
 import SessionStats from '@/components/SessionStats'
 import RecommendationsWidget from '@/components/RecommendationsWidget'
 import AdvancedSearchModal from '@/components/AdvancedSearchModal'
-import { loadTrackManifest, searchTracks, getTracksByState } from '@/utils/manifest'
 import { Track, TargetState } from '@/types/track'
 import usePlayer from '@/store/usePlayer'
 
@@ -32,7 +31,6 @@ const stateDescriptions: Partial<Record<TargetState, string>> = {
 
 export default function HomePage() {
   const [tracks, setTracks] = useState<Track[]>([])
-  const [filteredTracks, setFilteredTracks] = useState<Track[]>([])
   const [selectedState, setSelectedState] = useState<TargetState | 'All'>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -51,12 +49,9 @@ export default function HomePage() {
     initializeAudio()
   }, [])
 
-  useEffect(() => {
-    filterTracks()
-  }, [tracks, selectedState, searchQuery])
-
   const loadData = async () => {
     try {
+      const { loadTrackManifest } = await import('@/utils/manifest')
       const manifest = await loadTrackManifest()
       setTracks(manifest.tracks)
     } catch (error) {
@@ -66,19 +61,31 @@ export default function HomePage() {
     }
   }
 
-  const filterTracks = async () => {
+  const filteredTracks = useMemo(() => {
     let filtered = tracks
 
     if (selectedState !== 'All') {
-      filtered = await getTracksByState(selectedState)
+      filtered = filtered.filter((t) => t.targetState === selectedState)
     }
 
-    if (searchQuery.trim()) {
-      filtered = await searchTracks(searchQuery)
+    const q = searchQuery.trim().toLowerCase()
+    if (q) {
+      const searchTerms = q.split(/\s+/).filter(Boolean)
+      filtered = filtered.filter((track) => {
+        const searchableText = [
+          track.title,
+          track.targetState,
+          track.description || '',
+          ...(track.tags || []),
+        ]
+          .join(' ')
+          .toLowerCase()
+        return searchTerms.every((term) => searchableText.includes(term))
+      })
     }
 
-    setFilteredTracks(filtered)
-  }
+    return filtered
+  }, [tracks, selectedState, searchQuery])
 
   const getRecentTracksData = () => {
     return recentTracks

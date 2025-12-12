@@ -37,6 +37,7 @@ export default function HomePage() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [hasAdvancedFilters, setHasAdvancedFilters] = useState(false)
   const [searchResultsCount, setSearchResultsCount] = useState<number | null>(null)
+  const [advancedResults, setAdvancedResults] = useState<Track[] | null>(null)
   
   const { recentTracks, favoriteTracks, currentTrack, initializeAudio } = usePlayer()
 
@@ -86,6 +87,8 @@ export default function HomePage() {
 
     return filtered
   }, [tracks, selectedState, searchQuery])
+
+  const displayedTracks = advancedResults ?? filteredTracks
 
   const getRecentTracksData = () => {
     return recentTracks
@@ -167,7 +170,15 @@ export default function HomePage() {
                   type="text"
                   placeholder="Search tracks, states, frequencies..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    // If the user starts typing, clear advanced override results (they can re-open filters).
+                    if (advancedResults) {
+                      setAdvancedResults(null)
+                      setSearchResultsCount(null)
+                      setHasAdvancedFilters(false)
+                    }
+                  }}
                   className="w-full pl-10 pr-12 py-3 sm:py-3 text-sm sm:text-base bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus-ring"
                 />
                 <button
@@ -217,7 +228,12 @@ export default function HomePage() {
               {stateOptions.map((state) => (
                 <button
                   key={state}
-                  onClick={() => setSelectedState(state)}
+                  onClick={() => {
+                    setSelectedState(state)
+                    setAdvancedResults(null)
+                    setSearchResultsCount(null)
+                    setHasAdvancedFilters(false)
+                  }}
                   className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
                     selectedState === state
                       ? 'bg-primary text-primary-foreground'
@@ -272,13 +288,13 @@ export default function HomePage() {
         )}
 
         {/* Main Content */}
-        {searchQuery || selectedState !== 'All' ? (
+        {searchQuery || selectedState !== 'All' || hasAdvancedFilters ? (
           // Search Results or Filtered Results
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-2xl font-semibold">
-                  {searchQuery ? `Search Results` : `${selectedState} Tracks`}
+                  {searchQuery ? `Search Results` : hasAdvancedFilters ? `Filtered Results` : `${selectedState} Tracks`}
                 </h3>
                 {searchQuery && (
                   <p className="text-sm text-muted-foreground mt-1">
@@ -289,7 +305,7 @@ export default function HomePage() {
               </div>
               <div className="text-right">
                 <span className="text-sm text-muted-foreground">
-                  {searchResultsCount !== null ? searchResultsCount : filteredTracks.length} track{(searchResultsCount !== null ? searchResultsCount : filteredTracks.length) !== 1 ? 's' : ''}
+                  {searchResultsCount !== null ? searchResultsCount : displayedTracks.length} track{(searchResultsCount !== null ? searchResultsCount : displayedTracks.length) !== 1 ? 's' : ''}
                 </span>
                 {hasAdvancedFilters && (
                   <div className="text-xs text-primary mt-1 flex items-center justify-end space-x-1">
@@ -300,7 +316,7 @@ export default function HomePage() {
               </div>
             </div>
             
-            {filteredTracks.length === 0 ? (
+            {displayedTracks.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold mb-2">No tracks found</h3>
@@ -310,7 +326,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {filteredTracks.map((track) => (
+                {displayedTracks.map((track) => (
                   <TrackCard key={track.id} track={track} />
                 ))}
               </div>
@@ -384,7 +400,7 @@ export default function HomePage() {
           isOpen={showAdvancedSearch}
           onClose={() => setShowAdvancedSearch(false)}
           onApplyFilters={(filters, results) => {
-            setFilteredTracks(results)
+            setAdvancedResults(results)
             setSearchResultsCount(results.length)
             setHasAdvancedFilters(
               filters.targetStates.length > 0 ||

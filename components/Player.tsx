@@ -253,7 +253,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
     }
   }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSeek = (e: React.MouseEvent<HTMLElement>) => {
     if (!duration) return
     
     const rect = e.currentTarget.getBoundingClientRect()

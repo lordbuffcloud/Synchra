@@ -251,13 +251,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Session Stats */}
-        <SessionStats />
-
-        {/* Recommendations */}
-        <RecommendationsWidget />
-
-        {/* Guided Meditations - Featured Section */}
+        {/* Guided Meditations - Featured Section (top of page for visibility) */}
         {(() => {
           const guidedTracks = tracks.filter(t => t.tags?.includes('guided'))
           if (guidedTracks.length === 0) return null
@@ -370,6 +364,12 @@ export default function HomePage() {
             </section>
           )
         })()}
+
+        {/* Session Stats */}
+        <SessionStats />
+
+        {/* Recommendations */}
+        <RecommendationsWidget />
 
         {/* Search and Filters */}
         <section className="mb-6 sm:mb-8">

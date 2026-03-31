@@ -2,7 +2,7 @@
   "tracks": [
     {
       "id": "nv01-rv-primer-12to7p83",
-      "title": "NV01 \u2022 RV Primer 12\u21927.83 Hz",
+      "title": "NV01 • RV Primer 12→7.83 Hz",
       "filenameWebm": "NV01_RV_Primer_12to7p83.webm",
       "filenameAac": "NV01_RV_Primer_12to7p83.m4a",
       "durationSec": 2700,
@@ -17,11 +17,11 @@
         "HRV 0.1 Hz"
       ],
       "gainDb": 0,
-      "description": "Alpha\u2192theta ramp landing at 7.83 Hz with pink-noise bed, Schumann AM cue, and HRV-paced envelope."
+      "description": "Alpha→theta ramp landing at 7.83 Hz with pink-noise bed, Schumann AM cue, and HRV-paced envelope."
     },
     {
       "id": "nv02-schumann-hold-7p83",
-      "title": "NV02 \u2022 Schumann Hold 7.83 Hz",
+      "title": "NV02 • Schumann Hold 7.83 Hz",
       "filenameWebm": "NV02_Schumann_Hold_7p83.webm",
       "filenameAac": "NV02_Schumann_Hold_7p83.m4a",
       "durationSec": 2700,
@@ -39,7 +39,7 @@
     },
     {
       "id": "nv03-gate-8to4",
-      "title": "NV03 \u2022 Gate 8\u21924 Hz",
+      "title": "NV03 • Gate 8→4 Hz",
       "filenameWebm": "NV03_Gate_8to4.webm",
       "filenameAac": "NV03_Gate_8to4.m4a",
       "durationSec": 3600,
@@ -57,7 +57,7 @@
     },
     {
       "id": "nv04-theta-stabilizer-6",
-      "title": "NV04 \u2022 Theta Stabilizer 6 Hz",
+      "title": "NV04 • Theta Stabilizer 6 Hz",
       "filenameWebm": "NV04_Theta_Stabilizer_6Hz.webm",
       "filenameAac": "NV04_Theta_Stabilizer_6Hz.m4a",
       "durationSec": 4500,
@@ -74,7 +74,7 @@
     },
     {
       "id": "nv05-cfc-theta6-gamma40",
-      "title": "NV05 \u2022 CFC: Theta 6 + Gamma 40",
+      "title": "NV05 • CFC: Theta 6 + Gamma 40",
       "filenameWebm": "NV05_CFC_Theta6_Gamma40.webm",
       "filenameAac": "NV05_CFC_Theta6_Gamma40.m4a",
       "durationSec": 1800,
@@ -88,11 +88,11 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "6 Hz binaural core with 40 Hz modulation on the bed for theta\u2013gamma cross-frequency flavor."
+      "description": "6 Hz binaural core with 40 Hz modulation on the bed for theta–gamma cross-frequency flavor."
     },
     {
       "id": "nv06-breathsync-10to6",
-      "title": "NV06 \u2022 Breath-Sync 10\u21926 Hz",
+      "title": "NV06 • Breath-Sync 10→6 Hz",
       "filenameWebm": "NV06_BreathSync_10to6_0p1Hz.webm",
       "filenameAac": "NV06_BreathSync_10to6_0p1Hz.m4a",
       "durationSec": 2700,
@@ -105,11 +105,11 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Alpha\u2192theta ramp coupled to 0.1 Hz breath envelope to lock parasympathetic rhythm."
+      "description": "Alpha→theta ramp coupled to 0.1 Hz breath envelope to lock parasympathetic rhythm."
     },
     {
       "id": "nv07-dualbeat-6-12",
-      "title": "NV07 \u2022 Dual-Beat 6 & 12 Hz",
+      "title": "NV07 • Dual-Beat 6 & 12 Hz",
       "filenameWebm": "NV07_DualBeat_6_and_12.webm",
       "filenameAac": "NV07_DualBeat_6_and_12.m4a",
       "durationSec": 2700,
@@ -127,7 +127,7 @@
     },
     {
       "id": "nv08-microitd-drift-6",
-      "title": "NV08 \u2022 Micro-ITD Drift 6 Hz",
+      "title": "NV08 • Micro-ITD Drift 6 Hz",
       "filenameWebm": "NV08_MicroITD_Drift_6Hz.webm",
       "filenameAac": "NV08_MicroITD_Drift_6Hz.m4a",
       "durationSec": 2700,
@@ -145,7 +145,7 @@
     },
     {
       "id": "nv09-spindlebridge-13-on-bed",
-      "title": "NV09 \u2022 Spindle Bridge 13 Hz (bed)",
+      "title": "NV09 • Spindle Bridge 13 Hz (bed)",
       "filenameWebm": "NV09_SpindleBridge_13Hz_onBed.webm",
       "filenameAac": "NV09_SpindleBridge_13Hz_onBed.m4a",
       "durationSec": 2700,
@@ -163,7 +163,7 @@
     },
     {
       "id": "nv10-gamma-assr-8-40am",
-      "title": "NV10 \u2022 Gamma-ASSR 8 Hz + 40 AM",
+      "title": "NV10 • Gamma-ASSR 8 Hz + 40 AM",
       "filenameWebm": "NV10_GammaASSR_8HzBeat_40AM.webm",
       "filenameAac": "NV10_GammaASSR_8HzBeat_40AM.m4a",
       "durationSec": 2700,
@@ -181,7 +181,7 @@
     },
     {
       "id": "nv11-delta-gate-4to3",
-      "title": "NV11 \u2022 Delta Gate 4\u21923 Hz",
+      "title": "NV11 • Delta Gate 4→3 Hz",
       "filenameWebm": "NV11_DeltaGate_4to3.webm",
       "filenameAac": "NV11_DeltaGate_4to3.m4a",
       "durationSec": 5400,
@@ -193,11 +193,11 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Theta\u2192delta drift for heavy drop; gentle pink bed only."
+      "description": "Theta→delta drift for heavy drop; gentle pink bed only."
     },
     {
       "id": "nv12-anchor-return-8to12",
-      "title": "NV12 \u2022 Anchor Return 8\u219212 Hz",
+      "title": "NV12 • Anchor Return 8→12 Hz",
       "filenameWebm": "NV12_AnchorReturn_8to12.webm",
       "filenameAac": "NV12_AnchorReturn_8to12.m4a",
       "durationSec": 2700,
@@ -213,7 +213,7 @@
     },
     {
       "id": "nv13-schumann-steps",
-      "title": "NV13 \u2022 Schumann Steps 7.6\u21928.06 Hz",
+      "title": "NV13 • Schumann Steps 7.6→8.06 Hz",
       "filenameWebm": "NV13_Schumann_Steps_7p83.webm",
       "filenameAac": "NV13_Schumann_Steps_7p83.m4a",
       "durationSec": 2700,
@@ -230,7 +230,7 @@
     },
     {
       "id": "nv14-stochastic-dither-6",
-      "title": "NV14 \u2022 Stochastic Dither 6 Hz",
+      "title": "NV14 • Stochastic Dither 6 Hz",
       "filenameWebm": "NV14_Stochastic_Dither_6Hz.webm",
       "filenameAac": "NV14_Stochastic_Dither_6Hz.m4a",
       "durationSec": 2700,
@@ -247,7 +247,7 @@
     },
     {
       "id": "nv15-hemi-alternator-6-swap10",
-      "title": "NV15 \u2022 Hemi-Alternator 6 Hz (swap/10s)",
+      "title": "NV15 • Hemi-Alternator 6 Hz (swap/10s)",
       "filenameWebm": "NV15_HemiAlternator_6Hz_swap10s.webm",
       "filenameAac": "NV15_HemiAlternator_6Hz_swap10s.m4a",
       "durationSec": 2700,
@@ -279,7 +279,9 @@
       ],
       "gainDb": 0,
       "description": "Stage 3-4 NREM sleep induction at 2 Hz. Promotes growth hormone release and deep physical restoration. Pink noise bed for ambient comfort.",
-      "peaksPath": "peaks/bb-delta-2hz-deep-sleep.json"
+      "peaksPath": "peaks/bb-delta-2hz-deep-sleep.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-2hz-deep-sleep.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-2hz-deep-sleep.m4a"
     },
     {
       "id": "bb-delta-3hz-immune",
@@ -298,7 +300,9 @@
       ],
       "gainDb": 0,
       "description": "Extended delta session for immune system restoration. 3 Hz promotes cellular repair and deep recovery cycles.",
-      "peaksPath": "peaks/bb-delta-3hz-immune.json"
+      "peaksPath": "peaks/bb-delta-3hz-immune.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-3hz-immune.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-3hz-immune.m4a"
     },
     {
       "id": "bb-delta-1hz-dreamless",
@@ -317,11 +321,13 @@
       ],
       "gainDb": 0,
       "description": "Lowest practical delta frequency. Accesses deepest unconscious healing states. Brown noise bed for warmth.",
-      "peaksPath": "peaks/bb-delta-1hz-dreamless.json"
+      "peaksPath": "peaks/bb-delta-1hz-dreamless.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-1hz-dreamless.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-1hz-dreamless.m4a"
     },
     {
       "id": "bb-delta-ramp-6to2",
-      "title": "Sleep Descent 6\u21922 Hz",
+      "title": "Sleep Descent 6→2 Hz",
       "filenameWebm": "bb-delta-ramp-6to2.webm",
       "filenameAac": "bb-delta-ramp-6to2.m4a",
       "durationSec": 2700,
@@ -335,7 +341,9 @@
         "sleep-onset"
       ],
       "gainDb": 0,
-      "description": "Gradual theta-to-delta descent mimicking natural sleep onset over 15 minutes, then holds at 2 Hz."
+      "description": "Gradual theta-to-delta descent mimicking natural sleep onset over 15 minutes, then holds at 2 Hz.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-ramp-6to2.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-delta-ramp-6to2.m4a"
     },
     {
       "id": "bb-theta-6hz-meditation",
@@ -354,7 +362,9 @@
       ],
       "gainDb": 0,
       "description": "Pure 6 Hz theta for deep meditation. The most researched theta frequency, facilitating insight, creativity, and emotional processing.",
-      "peaksPath": "peaks/bb-theta-6hz-meditation.json"
+      "peaksPath": "peaks/bb-theta-6hz-meditation.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-6hz-meditation.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-6hz-meditation.m4a"
     },
     {
       "id": "bb-theta-4.5hz-hypnagogic",
@@ -373,7 +383,9 @@
       ],
       "gainDb": 0,
       "description": "Delta-theta border frequency for hypnagogic imagery and lucid states. Vivid visual phenomena and dream-like awareness.",
-      "peaksPath": "peaks/bb-theta-4.5hz-hypnagogic.json"
+      "peaksPath": "peaks/bb-theta-4.5hz-hypnagogic.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-4.5hz-hypnagogic.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-4.5hz-hypnagogic.m4a"
     },
     {
       "id": "bb-theta-6-cfc-gamma40",
@@ -393,7 +405,9 @@
       ],
       "gainDb": 0,
       "description": "Cross-frequency coupling: 6 Hz theta with 40 Hz gamma AM overlay. Linked to memory consolidation and cognitive binding.",
-      "peaksPath": "peaks/bb-theta-6-cfc-gamma40.json"
+      "peaksPath": "peaks/bb-theta-6-cfc-gamma40.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-6-cfc-gamma40.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-6-cfc-gamma40.m4a"
     },
     {
       "id": "bb-theta-5hz-creative",
@@ -412,7 +426,9 @@
       ],
       "gainDb": 0,
       "description": "Mid-theta optimized for creative problem-solving. Used in Monroe Institute protocols for insight access.",
-      "peaksPath": "peaks/bb-theta-5hz-creative.json"
+      "peaksPath": "peaks/bb-theta-5hz-creative.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-5hz-creative.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-5hz-creative.m4a"
     },
     {
       "id": "bb-theta-7hz-visualization",
@@ -431,7 +447,9 @@
       ],
       "gainDb": 0,
       "description": "Upper theta for vivid mental imagery and visualization. Heart-centered frequency for emotional harmonizing.",
-      "peaksPath": "peaks/bb-theta-7hz-visualization.json"
+      "peaksPath": "peaks/bb-theta-7hz-visualization.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-7hz-visualization.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-theta-7hz-visualization.m4a"
     },
     {
       "id": "bb-alpha-schumann-7.83",
@@ -451,7 +469,9 @@
       ],
       "gainDb": 0,
       "description": "Earth's electromagnetic resonance frequency. Promotes grounding, calm focus, and parasympathetic activation.",
-      "peaksPath": "peaks/bb-alpha-schumann-7.83.json"
+      "peaksPath": "peaks/bb-alpha-schumann-7.83.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-schumann-7.83.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-schumann-7.83.m4a"
     },
     {
       "id": "bb-alpha-10hz-peak",
@@ -470,11 +490,13 @@
       ],
       "gainDb": 0,
       "description": "Individual alpha peak frequency. Optimal for relaxed alertness, flow state, learning readiness, and calm focus.",
-      "peaksPath": "peaks/bb-alpha-10hz-peak.json"
+      "peaksPath": "peaks/bb-alpha-10hz-peak.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-10hz-peak.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-10hz-peak.m4a"
     },
     {
       "id": "bb-alpha-ramp-12to7.83",
-      "title": "Alpha Primer 12\u21927.83 Hz",
+      "title": "Alpha Primer 12→7.83 Hz",
       "filenameWebm": "bb-alpha-ramp-12to7.83.webm",
       "filenameAac": "bb-alpha-ramp-12to7.83.m4a",
       "durationSec": 1800,
@@ -490,7 +512,9 @@
       ],
       "gainDb": 0,
       "description": "Gentle alpha-to-Schumann descent over 8 minutes. Eases from alert state into calm meditative readiness.",
-      "peaksPath": "peaks/bb-alpha-ramp-12to7.83.json"
+      "peaksPath": "peaks/bb-alpha-ramp-12to7.83.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-ramp-12to7.83.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-ramp-12to7.83.m4a"
     },
     {
       "id": "bb-alpha-8hz-relaxation",
@@ -509,7 +533,9 @@
       ],
       "gainDb": 0,
       "description": "Low alpha for deep relaxation without drowsiness. Reduces anxiety and promotes emotional calm.",
-      "peaksPath": "peaks/bb-alpha-8hz-relaxation.json"
+      "peaksPath": "peaks/bb-alpha-8hz-relaxation.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-8hz-relaxation.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-alpha-8hz-relaxation.m4a"
     },
     {
       "id": "bb-beta-14hz-smr",
@@ -529,7 +555,9 @@
       ],
       "gainDb": 0,
       "description": "Sensorimotor rhythm (12-15 Hz) for calm, stable focus. Used in ADHD neurofeedback protocols for attention enhancement.",
-      "peaksPath": "peaks/bb-beta-14hz-smr.json"
+      "peaksPath": "peaks/bb-beta-14hz-smr.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-14hz-smr.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-14hz-smr.m4a"
     },
     {
       "id": "bb-beta-18hz-analytical",
@@ -548,7 +576,9 @@
       ],
       "gainDb": 0,
       "description": "Mid-beta for engaged analytical thinking and problem-solving. Sustained attention for demanding cognitive tasks.",
-      "peaksPath": "peaks/bb-beta-18hz-analytical.json"
+      "peaksPath": "peaks/bb-beta-18hz-analytical.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-18hz-analytical.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-18hz-analytical.m4a"
     },
     {
       "id": "bb-beta-20hz-peak",
@@ -567,11 +597,13 @@
       ],
       "gainDb": 0,
       "description": "High-beta for peak cognitive output with isochronic pulse overlay. Best for intense concentration demands.",
-      "peaksPath": "peaks/bb-beta-20hz-peak.json"
+      "peaksPath": "peaks/bb-beta-20hz-peak.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-20hz-peak.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-20hz-peak.m4a"
     },
     {
       "id": "bb-beta-ramp-8to18",
-      "title": "Morning Activation 8\u219218 Hz",
+      "title": "Morning Activation 8→18 Hz",
       "filenameWebm": "bb-beta-ramp-8to18.webm",
       "filenameAac": "bb-beta-ramp-8to18.m4a",
       "durationSec": 900,
@@ -587,7 +619,9 @@
       ],
       "gainDb": 0,
       "description": "Morning cognitive warm-up: alpha-to-beta ramp over 10 minutes for gentle activation without jarring wakefulness.",
-      "peaksPath": "peaks/bb-beta-ramp-8to18.json"
+      "peaksPath": "peaks/bb-beta-ramp-8to18.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-ramp-8to18.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-beta-ramp-8to18.m4a"
     },
     {
       "id": "bb-gamma-40hz-cognition",
@@ -606,7 +640,9 @@
       ],
       "gainDb": 0,
       "description": "40 Hz gamma for cognitive binding and information integration. Research shows neuroprotective effects and enhanced clarity.",
-      "peaksPath": "peaks/bb-gamma-40hz-cognition.json"
+      "peaksPath": "peaks/bb-gamma-40hz-cognition.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-gamma-40hz-cognition.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-gamma-40hz-cognition.m4a"
     },
     {
       "id": "bb-gamma-40hz-mit-protocol",
@@ -626,7 +662,9 @@
       ],
       "gainDb": 0,
       "description": "Extended 40 Hz protocol based on MIT/Georgia Tech research. Isochronic overlay enhances entrainment for neuroprotection.",
-      "peaksPath": "peaks/bb-gamma-40hz-mit-protocol.json"
+      "peaksPath": "peaks/bb-gamma-40hz-mit-protocol.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-gamma-40hz-mit-protocol.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-gamma-40hz-mit-protocol.m4a"
     },
     {
       "id": "bb-adv-focus10",
@@ -646,7 +684,9 @@
       ],
       "gainDb": 0,
       "description": "Monroe-inspired Focus 10 protocol. Theta core with alpha awareness layer. Mental alertness while body enters deep relaxation.",
-      "peaksPath": "peaks/bb-adv-focus10.json"
+      "peaksPath": "peaks/bb-adv-focus10.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-focus10.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-focus10.m4a"
     },
     {
       "id": "bb-adv-flow-state",
@@ -666,7 +706,9 @@
       ],
       "gainDb": 0,
       "description": "Alpha-theta border with subtle gamma. This crossover zone is where flow states emerge in neurofeedback research.",
-      "peaksPath": "peaks/bb-adv-flow-state.json"
+      "peaksPath": "peaks/bb-adv-flow-state.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-flow-state.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-flow-state.m4a"
     },
     {
       "id": "bb-adv-lucid-dream",
@@ -685,7 +727,9 @@
       ],
       "gainDb": 0,
       "description": "Theta-gamma coupling for lucid awareness in dream state. 40 Hz gamma maintains awareness while theta promotes dreaming.",
-      "peaksPath": "peaks/bb-adv-lucid-dream.json"
+      "peaksPath": "peaks/bb-adv-lucid-dream.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-lucid-dream.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-adv-lucid-dream.m4a"
     },
     {
       "id": "bb-solf-528-theta",
@@ -704,7 +748,9 @@
       ],
       "gainDb": 0,
       "description": "528 Hz \"transformation\" frequency as carrier with 6 Hz theta beat. Combines solfeggio resonance with deep meditation.",
-      "peaksPath": "peaks/bb-solf-528-theta.json"
+      "peaksPath": "peaks/bb-solf-528-theta.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-solf-528-theta.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-solf-528-theta.m4a"
     },
     {
       "id": "bb-solf-432-alpha",
@@ -723,7 +769,9 @@
       ],
       "gainDb": 0,
       "description": "432 Hz \"natural tuning\" carrier with 10 Hz alpha beat. Gentle, harmonious relaxation and mental clarity.",
-      "peaksPath": "peaks/bb-solf-432-alpha.json"
+      "peaksPath": "peaks/bb-solf-432-alpha.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-solf-432-alpha.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-solf-432-alpha.m4a"
     },
     {
       "id": "bb-protocol-sleep-60",
@@ -742,8 +790,10 @@
         "sleep"
       ],
       "gainDb": 0,
-      "description": "Full sleep protocol: 10min alpha relaxation \u2192 20min theta bridge \u2192 30min delta sleep. Mimics natural sleep architecture.",
-      "peaksPath": "peaks/bb-protocol-sleep-60.json"
+      "description": "Full sleep protocol: 10min alpha relaxation → 20min theta bridge → 30min delta sleep. Mimics natural sleep architecture.",
+      "peaksPath": "peaks/bb-protocol-sleep-60.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-protocol-sleep-60.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-protocol-sleep-60.m4a"
     },
     {
       "id": "bb-protocol-focus-45",
@@ -762,8 +812,10 @@
         "focus"
       ],
       "gainDb": 0,
-      "description": "Full focus session: 10min SMR warm-up \u2192 25min peak beta \u2192 10min alpha cooldown. Optimal cognitive performance arc.",
-      "peaksPath": "peaks/bb-protocol-focus-45.json"
+      "description": "Full focus session: 10min SMR warm-up → 25min peak beta → 10min alpha cooldown. Optimal cognitive performance arc.",
+      "peaksPath": "peaks/bb-protocol-focus-45.json",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-protocol-focus-45.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/bb-protocol-focus-45.m4a"
     },
     {
       "id": "ap01-first-gateway",
@@ -782,7 +834,9 @@
         "relaxation"
       ],
       "gainDb": 0,
-      "description": "Beginner guided meditation for astral projection featuring progressive relaxation, theta brainwave descent, and body awareness dissolution. Uses 4.5 Hz theta binaural beats with Schumann resonance anchoring."
+      "description": "Beginner guided meditation for astral projection featuring progressive relaxation, theta brainwave descent, and body awareness dissolution. Uses 4.5 Hz theta binaural beats with Schumann resonance anchoring.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap01-first-gateway.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap01-first-gateway.m4a"
     },
     {
       "id": "ap02-vibration-state",
@@ -791,7 +845,7 @@
       "filenameAac": "ap02-vibration-state.m4a",
       "durationSec": 1500,
       "targetState": "Astral Projection",
-      "beatHz": 8.0,
+      "beatHz": 8,
       "tags": [
         "guided",
         "astral projection",
@@ -802,7 +856,9 @@
         "binaural beats"
       ],
       "gainDb": 0,
-      "description": "Intermediate guided meditation inducing the vibrational state prerequisite for astral projection. Features energy body activation, progressive vibration intensification, and the rope technique for separation."
+      "description": "Intermediate guided meditation inducing the vibrational state prerequisite for astral projection. Features energy body activation, progressive vibration intensification, and the rope technique for separation.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap02-vibration-state.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap02-vibration-state.m4a"
     },
     {
       "id": "ap03-full-exit-protocol",
@@ -811,7 +867,7 @@
       "filenameAac": "ap03-full-exit-protocol.m4a",
       "durationSec": 2100,
       "targetState": "Astral Projection",
-      "beatHz": 10.0,
+      "beatHz": 10,
       "tags": [
         "guided",
         "astral projection",
@@ -824,9 +880,11 @@
         "binaural beats"
       ],
       "gainDb": 0,
-      "description": "Advanced Monroe-style guided meditation progressing through Focus 10 (Mind Awake/Body Asleep), Focus 12 (Expanded Awareness), and Focus 15 (No-Time). Complete exit protocol with resonant tuning, energy boxing, and separation techniques."
+      "description": "Advanced Monroe-style guided meditation progressing through Focus 10 (Mind Awake/Body Asleep), Focus 12 (Expanded Awareness), and Focus 15 (No-Time). Complete exit protocol with resonant tuning, energy boxing, and separation techniques.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap03-full-exit-protocol.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap03-full-exit-protocol.m4a"
     }
   ],
-  "lastUpdated": "2026-03-31T00:00:00.000Z",
+  "lastUpdated": "2026-03-31T16:05:19.265Z",
   "totalTracks": 44
 }

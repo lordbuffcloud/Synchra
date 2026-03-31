@@ -106,47 +106,51 @@ const usePlayer = create<PlayerState>()(
         const { audioGraph } = get()
         if (audioGraph) return
 
-        const graph = new AudioGraph()
-        const noiseGen = new NoiseGenerator(graph.getContext())
-        
-        // Noise bus enables future modulation without affecting the main program material.
-        const noiseBus = graph.getContext().createGain()
-        noiseBus.gain.value = 1
-        noiseBus.connect(graph.getMasterGain())
-        noiseGen.connect(noiseBus)
+        try {
+          const graph = new AudioGraph()
+          const noiseGen = new NoiseGenerator(graph.getContext())
 
-        // Create two persistent media elements and connect to crossfader inputs
-        const mediaA = new Audio()
-        const mediaB = new Audio()
-        mediaA.preload = 'auto'
-        mediaB.preload = 'auto'
-        mediaA.crossOrigin = 'anonymous'
-        mediaB.crossOrigin = 'anonymous'
+          // Noise bus enables future modulation without affecting the main program material.
+          const noiseBus = graph.getContext().createGain()
+          noiseBus.gain.value = 1
+          noiseBus.connect(graph.getMasterGain())
+          noiseGen.connect(noiseBus)
 
-        const sourceA = graph.createMediaElementSource(mediaA)
-        const sourceB = graph.createMediaElementSource(mediaB)
+          // Create two persistent media elements and connect to crossfader inputs
+          const mediaA = new Audio()
+          const mediaB = new Audio()
+          mediaA.preload = 'auto'
+          mediaB.preload = 'auto'
+          mediaA.crossOrigin = 'anonymous'
+          mediaB.crossOrigin = 'anonymous'
 
-        // Per-slot gain enables track-level normalization (LUFS adjustment).
-        const mediaGainA = graph.getContext().createGain()
-        const mediaGainB = graph.getContext().createGain()
-        mediaGainA.gain.value = 1
-        mediaGainB.gain.value = 1
+          const sourceA = graph.createMediaElementSource(mediaA)
+          const sourceB = graph.createMediaElementSource(mediaB)
 
-        sourceA.connect(mediaGainA)
-        sourceB.connect(mediaGainB)
-        mediaGainA.connect(graph.getCrossfader().getInputA())
-        mediaGainB.connect(graph.getCrossfader().getInputB())
-        
-        set({
-          audioGraph: graph,
-          noiseGenerator: noiseGen,
-          noiseBus,
-          mediaA,
-          mediaB,
-          mediaGainA,
-          mediaGainB,
-          activeMediaSlot: null,
-        })
+          // Per-slot gain enables track-level normalization (LUFS adjustment).
+          const mediaGainA = graph.getContext().createGain()
+          const mediaGainB = graph.getContext().createGain()
+          mediaGainA.gain.value = 1
+          mediaGainB.gain.value = 1
+
+          sourceA.connect(mediaGainA)
+          sourceB.connect(mediaGainB)
+          mediaGainA.connect(graph.getCrossfader().getInputA())
+          mediaGainB.connect(graph.getCrossfader().getInputB())
+
+          set({
+            audioGraph: graph,
+            noiseGenerator: noiseGen,
+            noiseBus,
+            mediaA,
+            mediaB,
+            mediaGainA,
+            mediaGainB,
+            activeMediaSlot: null,
+          })
+        } catch (error) {
+          console.error('Failed to initialize audio:', error)
+        }
       },
 
       loadTrack: async (track: Track) => {

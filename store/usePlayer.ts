@@ -150,15 +150,20 @@ const usePlayer = create<PlayerState>()(
       },
 
       loadTrack: async (track: Track) => {
-        const { audioGraph } = get()
+        let { audioGraph } = get()
         if (!audioGraph) {
           await get().initializeAudio()
+          audioGraph = get().audioGraph
+        }
+
+        if (!audioGraph) {
+          throw new Error('AudioContext failed to initialize')
         }
 
         set({ isLoading: true, currentTrack: track })
 
         try {
-          await audioGraph!.resume()
+          await audioGraph.resume()
 
           // Determine codec
           const supportsOpus = 'MediaSource' in window && MediaSource.isTypeSupported('audio/webm; codecs="opus"')

@@ -84,14 +84,14 @@ async function handleAudioRequest(request) {
 
   try {
     const response = await fetch(request)
-    if (response.ok) {
-      // Clone before caching
+    // Only cache full 200 responses — 206 partial responses are not supported by Cache API
+    if (response.status === 200) {
       cache.put(request, response.clone())
     }
     return response
   } catch (error) {
     console.warn('Failed to fetch audio:', error)
-    
+
     // Return cached version if available, even if stale
     const staleResponse = await cache.match(request)
     if (staleResponse) {
@@ -177,7 +177,8 @@ async function handleStaticRequest(request) {
     }
 
     const response = await fetch(request)
-    if (response.ok) {
+    // Only cache full 200 responses — 206 partial responses are not supported by Cache API
+    if (response.status === 200) {
       cache.put(request, response.clone())
     }
     return response

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import MiniPlayer from '@/components/MiniPlayer'
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Synchra'
 
@@ -66,6 +67,7 @@ export default function RootLayout({
         <div className="relative flex min-h-screen flex-col">
           <div className="flex-1">{children}</div>
         </div>
+        <MiniPlayer />
         <script dangerouslySetInnerHTML={{__html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

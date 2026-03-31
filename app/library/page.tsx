@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Search, Filter, Heart, Clock, Download, Trash2, RefreshCw } from 'lucide-react'
+import { Search, Filter, Heart, Clock, Download, Trash2, RefreshCw, Mic } from 'lucide-react'
 import Header from '@/components/Header'
 import TrackCard from '@/components/TrackCard'
 import ListeningAnalytics from '@/components/ListeningAnalytics'
@@ -36,7 +36,7 @@ function LibraryPageClient() {
 
   const [tracks, setTracks] = useState<Track[]>([])
   const [filteredTracks, setFilteredTracks] = useState<Track[]>([])
-  const [selectedState, setSelectedState] = useState<TargetState | 'All' | 'favorites'>(
+  const [selectedState, setSelectedState] = useState<TargetState | 'All' | 'favorites' | 'guided'>(
     initialFilter || 'All'
   )
   const [searchQuery, setSearchQuery] = useState('')
@@ -95,6 +95,8 @@ function LibraryPageClient() {
       filtered = favoriteTracks
         .map(id => tracks.find(track => track.id === id))
         .filter(Boolean) as Track[]
+    } else if (selectedState === 'guided') {
+      filtered = tracks.filter(track => track.tags?.includes('guided'))
     } else if (selectedState !== 'All') {
       filtered = await getTracksByState(selectedState as TargetState)
     }
@@ -301,20 +303,24 @@ function LibraryPageClient() {
             {/* Category Filter */}
             <div className="flex items-center space-x-2 overflow-x-auto pb-2 sm:pb-0">
               <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              {([...(targetStates as (TargetState | 'All')[]), 'favorites'] as Array<TargetState | 'All' | 'favorites'>).map((state) => (
+              {([...(targetStates as (TargetState | 'All')[]), 'guided', 'favorites'] as Array<TargetState | 'All' | 'favorites' | 'guided'>).map((state) => (
                 <button
                   key={state}
                   onClick={() => setSelectedState(state)}
                   className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center space-x-1 ${
                     selectedState === state
-                      ? 'bg-primary text-primary-foreground'
+                      ? state === 'guided' ? 'bg-amber-500 text-black' : 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {state === 'favorites' && <Heart className="w-3 h-3" />}
-                  <span>{state === 'favorites' ? 'Favorites' : state}</span>
+                  {state === 'guided' && <Mic className="w-3 h-3" />}
+                  <span>{state === 'favorites' ? 'Favorites' : state === 'guided' ? 'Guided' : state}</span>
                   {state === 'favorites' && (
                     <span className="text-xs opacity-75">({favoriteTracks.length})</span>
+                  )}
+                  {state === 'guided' && (
+                    <span className="text-xs opacity-75">({tracks.filter(t => t.tags?.includes('guided')).length})</span>
                   )}
                 </button>
               ))}
@@ -344,16 +350,20 @@ function LibraryPageClient() {
               {selectedState === 'favorites' ? '💝' : searchQuery ? '🔍' : '🎵'}
             </div>
             <h3 className="text-xl font-semibold mb-2">
-              {selectedState === 'favorites' 
-                ? 'No favorites yet' 
-                : searchQuery 
+              {selectedState === 'favorites'
+                ? 'No favorites yet'
+                : selectedState === 'guided'
+                ? 'No guided meditations'
+                : searchQuery
                 ? 'No tracks found'
                 : 'No tracks available'
               }
             </h3>
             <p className="text-muted-foreground">
-              {selectedState === 'favorites' 
+              {selectedState === 'favorites'
                 ? 'Add tracks to favorites by clicking the heart icon'
+                : selectedState === 'guided'
+                ? 'Guided meditations with voice narration will appear here'
                 : searchQuery
                 ? 'Try adjusting your search terms or browse different categories'
                 : 'The audio library is empty. Check your track configuration.'

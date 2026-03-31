@@ -11,6 +11,7 @@
     "test": "playwright test",
     "prepare": "tsx scripts/fetch_tracks.ts",
     "refresh:tracks": "tsx scripts/fetch_tracks.ts && git add -A && git commit -m \"chore(tracks): refresh\" || echo \"no changes\"",
+    "generate:beats": "tsx scripts/generate_binaural_tracks.ts",
     "deploy:vercel": "vercel --prod"
   },
   "dependencies": {

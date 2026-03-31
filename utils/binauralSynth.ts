@@ -4,6 +4,7 @@ export type BinauralPreset = {
   description: string
   beatHz: number
   baseHz: number
+  category: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma' | 'advanced' | 'solfeggio'
   // Optional: gentle ramp between two beat frequencies (start → end over seconds).
   ramp?: { fromHz: number; toHz: number; seconds: number }
   // Optional: breath/HRV envelope (0.1 Hz default) applied to overall level (subtle).
@@ -20,6 +21,17 @@ export type BinauralPreset = {
   // Optional: noise-bed amplitude modulation; targets the store's noise bus if provided.
   noiseAmHz?: number
   noiseAmDepth?: number
+  // Advanced: isochronic pulse overlay (amplitude gating at beat frequency)
+  isochronicHz?: number
+  isochronicDepth?: number
+  // Advanced: second carrier for harmonic layering
+  secondaryBeatHz?: number
+  // Research-backed session duration recommendation (minutes)
+  recommendedMinutes?: number
+  // Intensity level for UI display
+  intensity?: 'gentle' | 'moderate' | 'deep' | 'intense'
+  // Tags for searchability
+  tags?: string[]
 }
 
 export class BinauralBeatSynth {
@@ -51,6 +63,18 @@ export class BinauralBeatSynth {
 
   private noiseAmOsc?: OscillatorNode
   private noiseAmGain?: GainNode
+
+  // Isochronic pulse overlay
+  private isoOsc?: OscillatorNode
+  private isoGain?: GainNode
+
+  // Secondary binaural layer
+  private leftOsc2?: OscillatorNode
+  private rightOsc2?: OscillatorNode
+  private leftPan2?: StereoPannerNode
+  private rightPan2?: StereoPannerNode
+  private leftGain2?: GainNode
+  private rightGain2?: GainNode
 
   private started = false
 
@@ -154,11 +178,48 @@ export class BinauralBeatSynth {
       this.noiseAmOsc.start()
     }
 
+    // Isochronic pulse: amplitude gating for enhanced entrainment
+    this.isoGain = this.ctx.createGain()
+    this.isoGain.gain.value = 0
+    this.isoGain.connect(this.outGain.gain)
+
+    this.isoOsc = this.ctx.createOscillator()
+    this.isoOsc.type = 'square' // square wave for sharp on/off pulsing
+    this.isoOsc.frequency.value = 0
+    this.isoOsc.connect(this.isoGain)
+    this.isoOsc.start()
+
+    // Secondary binaural layer (for dual-frequency protocols)
+    this.leftOsc2 = this.ctx.createOscillator()
+    this.rightOsc2 = this.ctx.createOscillator()
+    this.leftOsc2.type = 'sine'
+    this.rightOsc2.type = 'sine'
+
+    this.leftGain2 = this.ctx.createGain()
+    this.rightGain2 = this.ctx.createGain()
+    this.leftGain2.gain.value = 0 // disabled by default
+    this.rightGain2.gain.value = 0
+
+    this.leftPan2 = this.ctx.createStereoPanner()
+    this.rightPan2 = this.ctx.createStereoPanner()
+    this.leftPan2.pan.value = -1
+    this.rightPan2.pan.value = 1
+
+    this.leftOsc2.connect(this.leftGain2)
+    this.leftGain2.connect(this.leftPan2)
+    this.leftPan2.connect(this.outGain)
+
+    this.rightOsc2.connect(this.rightGain2)
+    this.rightGain2.connect(this.rightPan2)
+    this.rightPan2.connect(this.outGain)
+
     this.applyPreset(preset)
 
     this.leftOsc.start()
     this.rightOsc.start()
     this.itdOsc.start()
+    this.leftOsc2.start()
+    this.rightOsc2.start()
 
     this.started = true
   }
@@ -196,6 +257,9 @@ export class BinauralBeatSynth {
     stopNode(this.itdOsc)
     stopNode(this.hemiOsc)
     stopNode(this.noiseAmOsc)
+    stopNode(this.isoOsc)
+    stopNode(this.leftOsc2)
+    stopNode(this.rightOsc2)
 
     // Disconnect a bit later (after fade)
     window.setTimeout(() => {
@@ -219,6 +283,14 @@ export class BinauralBeatSynth {
         this.hemiDepthR,
         this.noiseAmOsc,
         this.noiseAmGain,
+        this.isoOsc,
+        this.isoGain,
+        this.leftOsc2,
+        this.rightOsc2,
+        this.leftPan2,
+        this.rightPan2,
+        this.leftGain2,
+        this.rightGain2,
       ].forEach((n: any) => {
         try {
           n?.disconnect?.()
@@ -246,6 +318,14 @@ export class BinauralBeatSynth {
       this.hemiDepthR = undefined
       this.noiseAmOsc = undefined
       this.noiseAmGain = undefined
+      this.isoOsc = undefined
+      this.isoGain = undefined
+      this.leftOsc2 = undefined
+      this.rightOsc2 = undefined
+      this.leftPan2 = undefined
+      this.rightPan2 = undefined
+      this.leftGain2 = undefined
+      this.rightGain2 = undefined
       this.started = false
     }, 300)
   }
@@ -299,7 +379,7 @@ export class BinauralBeatSynth {
       this.hrvOsc = undefined
     }
 
-    // Output AM (gamma is common). Small tremolo for “CFC flavor”.
+    // Output AM (gamma is common). Small tremolo for "CFC flavor".
     const outAmHz = preset.outAmHz ?? preset.gammaAmHz ?? 0
     const outAmDepth = preset.outAmDepth ?? 0.015
     if (this.outAmGain) {
@@ -352,7 +432,29 @@ export class BinauralBeatSynth {
       this.noiseAmGain.gain.setTargetAtTime(noiseAmHz ? noiseAmDepth : 0, now, 0.1)
       this.noiseAmOsc.frequency.setTargetAtTime(noiseAmHz || 0, now, 0.1)
     }
+
+    // Isochronic pulse overlay: sharp amplitude gating enhances entrainment
+    const isoHz = preset.isochronicHz ?? 0
+    const isoDepth = preset.isochronicDepth ?? 0.02
+    if (this.isoOsc && this.isoGain) {
+      this.isoGain.gain.setTargetAtTime(isoHz ? isoDepth : 0, now, 0.1)
+      this.isoOsc.frequency.setTargetAtTime(isoHz || 0, now, 0.1)
+    }
+
+    // Secondary binaural layer
+    const secBeat = preset.secondaryBeatHz ?? 0
+    if (this.leftOsc2 && this.rightOsc2 && this.leftGain2 && this.rightGain2) {
+      if (secBeat > 0) {
+        const secLeftHz = Math.max(20, base - secBeat / 2)
+        const secRightHz = Math.max(20, base + secBeat / 2)
+        this.leftOsc2.frequency.setTargetAtTime(secLeftHz, now, 0.02)
+        this.rightOsc2.frequency.setTargetAtTime(secRightHz, now, 0.02)
+        this.leftGain2.gain.setTargetAtTime(0.35, now, 0.1)  // softer than primary
+        this.rightGain2.gain.setTargetAtTime(0.35, now, 0.1)
+      } else {
+        this.leftGain2.gain.setTargetAtTime(0, now, 0.1)
+        this.rightGain2.gain.setTargetAtTime(0, now, 0.1)
+      }
+    }
   }
 }
-
-

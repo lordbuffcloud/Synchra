@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Share2, Info } from 'lucide-react'
+import { ArrowLeft, Share2, Info, XCircle, Library } from 'lucide-react'
 import Header from '@/components/Header'
 import Player from '@/components/Player'
 import { getTrack } from '@/utils/manifest'
@@ -70,6 +70,14 @@ export default function PlayerPage() {
   const band = track?.beatHz ? getBandByFrequency(track.beatHz) : null
   const bandInfo = band ? brainwaveBands[band] : null
 
+  // Ambient glow color mapped to brainwave band
+  const glowColor = band === 'delta'  ? 'rgba(168, 85, 247, 0.4)' :   // purple
+                    band === 'theta'  ? 'rgba(129, 140, 248, 0.4)' :   // indigo
+                    band === 'alpha'  ? 'rgba(34, 211, 238, 0.4)' :    // cyan
+                    band === 'beta'   ? 'rgba(250, 204, 21, 0.4)' :    // yellow
+                    band === 'gamma'  ? 'rgba(251, 146, 60, 0.4)' :    // orange
+                                        'rgba(59, 130, 246, 0.4)'      // default blue
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -93,18 +101,29 @@ export default function PlayerPage() {
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">❌</div>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-destructive/10 flex items-center justify-center">
+              <XCircle className="w-8 h-8 text-destructive" />
+            </div>
             <h2 className="text-2xl font-bold mb-2">Track not found</h2>
             <p className="text-muted-foreground mb-4">
               The requested track could not be found or loaded.
             </p>
-            <Link 
-              href="/"
-              className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Library
-            </Link>
+            <div className="flex items-center justify-center gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Library
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-muted text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/80 transition-colors"
+              >
+                <Library className="w-4 h-4 mr-2" />
+                Browse Library
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -112,10 +131,18 @@ export default function PlayerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient background glow keyed to brainwave band */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 animate-ambient-breathe"
+        style={{
+          background: `radial-gradient(ellipse 60% 50% at 50% 40%, ${glowColor}, transparent 70%)`,
+        }}
+      />
+
       <Header />
-      
-      <main className="container mx-auto px-4 py-8">
+
+      <main className="container mx-auto px-4 py-8 relative z-10">
         {/* Navigation */}
         <div className="flex items-center justify-between mb-8">
           <Link

@@ -17,7 +17,9 @@
         "HRV 0.1 Hz"
       ],
       "gainDb": 0,
-      "description": "Alpha→theta ramp landing at 7.83 Hz with pink-noise bed, Schumann AM cue, and HRV-paced envelope."
+      "description": "Alpha→theta ramp landing at 7.83 Hz with pink-noise bed, Schumann AM cue, and HRV-paced envelope.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV01_RV_Primer_12to7p83.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV01_RV_Primer_12to7p83.m4a"
     },
     {
       "id": "nv02-schumann-hold-7p83",
@@ -35,7 +37,9 @@
         "HRV 0.1 Hz"
       ],
       "gainDb": 0,
-      "description": "Constant 7.83 Hz with gentle pink-noise AM at 7.83 Hz and slow-breath coupling."
+      "description": "Constant 7.83 Hz with gentle pink-noise AM at 7.83 Hz and slow-breath coupling.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV02_Schumann_Hold_7p83.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV02_Schumann_Hold_7p83.m4a"
     },
     {
       "id": "nv03-gate-8to4",
@@ -53,13 +57,15 @@
         "HRV 0.1 Hz"
       ],
       "gainDb": 0,
-      "description": "Theta deepening gate with pink-noise bed and 6 Hz AM assist; breath pacing embedded."
+      "description": "Theta deepening gate with pink-noise bed and 6 Hz AM assist; breath pacing embedded.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV03_Gate_8to4.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV03_Gate_8to4.m4a"
     },
     {
       "id": "nv04-theta-stabilizer-6",
       "title": "NV04 • Theta Stabilizer 6 Hz",
-      "filenameWebm": "NV04_Theta_Stabilizer_6Hz.webm",
-      "filenameAac": "NV04_Theta_Stabilizer_6Hz.m4a",
+      "filenameWebm": "NV04_Theta_Stabilizer_6.webm",
+      "filenameAac": "NV04_Theta_Stabilizer_6.m4a",
       "durationSec": 4500,
       "targetState": "Astral Projection",
       "beatHz": 6,
@@ -70,7 +76,9 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Fixed 6 Hz with pink-noise AM for sustained imagery and calm focus."
+      "description": "Fixed 6 Hz with pink-noise AM for sustained imagery and calm focus.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV04_Theta_Stabilizer_6.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV04_Theta_Stabilizer_6.m4a"
     },
     {
       "id": "nv05-cfc-theta6-gamma40",
@@ -88,13 +96,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "6 Hz binaural core with 40 Hz modulation on the bed for theta–gamma cross-frequency flavor."
+      "description": "6 Hz binaural core with 40 Hz modulation on the bed for theta–gamma cross-frequency flavor.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV05_CFC_Theta6_Gamma40.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV05_CFC_Theta6_Gamma40.m4a"
     },
     {
       "id": "nv06-breathsync-10to6",
       "title": "NV06 • Breath-Sync 10→6 Hz",
-      "filenameWebm": "NV06_BreathSync_10to6_0p1Hz.webm",
-      "filenameAac": "NV06_BreathSync_10to6_0p1Hz.m4a",
+      "filenameWebm": "NV06_BreathSync_10to6.webm",
+      "filenameAac": "NV06_BreathSync_10to6.m4a",
       "durationSec": 2700,
       "targetState": "Calm Focus",
       "beatHz": 6,
@@ -105,13 +115,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Alpha→theta ramp coupled to 0.1 Hz breath envelope to lock parasympathetic rhythm."
+      "description": "Alpha→theta ramp coupled to 0.1 Hz breath envelope to lock parasympathetic rhythm.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV06_BreathSync_10to6.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV06_BreathSync_10to6.m4a"
     },
     {
       "id": "nv07-dualbeat-6-12",
       "title": "NV07 • Dual-Beat 6 & 12 Hz",
-      "filenameWebm": "NV07_DualBeat_6_and_12.webm",
-      "filenameAac": "NV07_DualBeat_6_and_12.m4a",
+      "filenameWebm": "NV07_DualBeat_6_12.webm",
+      "filenameAac": "NV07_DualBeat_6_12.m4a",
       "durationSec": 2700,
       "targetState": "Remote Viewing",
       "beatHz": 6,
@@ -123,13 +135,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Primary 6 Hz with layered 12 Hz pair for alert-yet-internalized attention."
+      "description": "Primary 6 Hz with layered 12 Hz pair for alert-yet-internalized attention.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV07_DualBeat_6_12.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV07_DualBeat_6_12.m4a"
     },
     {
       "id": "nv08-microitd-drift-6",
       "title": "NV08 • Micro-ITD Drift 6 Hz",
-      "filenameWebm": "NV08_MicroITD_Drift_6Hz.webm",
-      "filenameAac": "NV08_MicroITD_Drift_6Hz.m4a",
+      "filenameWebm": "NV08_MicroITD_Drift_6.webm",
+      "filenameAac": "NV08_MicroITD_Drift_6.m4a",
       "durationSec": 2700,
       "targetState": "Inner Visuals",
       "beatHz": 6,
@@ -141,13 +155,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "6 Hz with ultra-slow interaural phase drift on R channel for subtle lateral spaciousness."
+      "description": "6 Hz with ultra-slow interaural phase drift on R channel for subtle lateral spaciousness.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV08_MicroITD_Drift_6.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV08_MicroITD_Drift_6.m4a"
     },
     {
       "id": "nv09-spindlebridge-13-on-bed",
       "title": "NV09 • Spindle Bridge 13 Hz (bed)",
-      "filenameWebm": "NV09_SpindleBridge_13Hz_onBed.webm",
-      "filenameAac": "NV09_SpindleBridge_13Hz_onBed.m4a",
+      "filenameWebm": "NV09_SpindleBridge_13_bed.webm",
+      "filenameAac": "NV09_SpindleBridge_13_bed.m4a",
       "durationSec": 2700,
       "targetState": "Memory/Imagery",
       "beatHz": 6,
@@ -159,13 +175,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "6 Hz core with 13 Hz AM on noise bed to nod at spindle dynamics without harsh clicks."
+      "description": "6 Hz core with 13 Hz AM on noise bed to nod at spindle dynamics without harsh clicks.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV09_SpindleBridge_13_bed.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV09_SpindleBridge_13_bed.m4a"
     },
     {
       "id": "nv10-gamma-assr-8-40am",
       "title": "NV10 • Gamma-ASSR 8 Hz + 40 AM",
-      "filenameWebm": "NV10_GammaASSR_8HzBeat_40AM.webm",
-      "filenameAac": "NV10_GammaASSR_8HzBeat_40AM.m4a",
+      "filenameWebm": "NV10_Gamma_ASSR_8_40AM.webm",
+      "filenameAac": "NV10_Gamma_ASSR_8_40AM.m4a",
       "durationSec": 2700,
       "targetState": "Alert Trance",
       "beatHz": 8,
@@ -177,13 +195,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "8 Hz beat with 40 Hz tremolo on carriers for an ASSR-friendly hybrid."
+      "description": "8 Hz beat with 40 Hz tremolo on carriers for an ASSR-friendly hybrid.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV10_Gamma_ASSR_8_40AM.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV10_Gamma_ASSR_8_40AM.m4a"
     },
     {
       "id": "nv11-delta-gate-4to3",
       "title": "NV11 • Delta Gate 4→3 Hz",
-      "filenameWebm": "NV11_DeltaGate_4to3.webm",
-      "filenameAac": "NV11_DeltaGate_4to3.m4a",
+      "filenameWebm": "NV11_Delta_Gate_4to3.webm",
+      "filenameAac": "NV11_Delta_Gate_4to3.m4a",
       "durationSec": 5400,
       "targetState": "Deep Sleep",
       "beatHz": 3,
@@ -193,13 +213,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Theta→delta drift for heavy drop; gentle pink bed only."
+      "description": "Theta→delta drift for heavy drop; gentle pink bed only.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV11_Delta_Gate_4to3.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV11_Delta_Gate_4to3.m4a"
     },
     {
       "id": "nv12-anchor-return-8to12",
       "title": "NV12 • Anchor Return 8→12 Hz",
-      "filenameWebm": "NV12_AnchorReturn_8to12.webm",
-      "filenameAac": "NV12_AnchorReturn_8to12.m4a",
+      "filenameWebm": "NV12_Anchor_Return_8to12.webm",
+      "filenameAac": "NV12_Anchor_Return_8to12.m4a",
       "durationSec": 2700,
       "targetState": "Reintegration",
       "beatHz": 12,
@@ -209,13 +231,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Re-entry ramp to crisp alpha for clean handoff back to waking."
+      "description": "Re-entry ramp to crisp alpha for clean handoff back to waking.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV12_Anchor_Return_8to12.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV12_Anchor_Return_8to12.m4a"
     },
     {
       "id": "nv13-schumann-steps",
       "title": "NV13 • Schumann Steps 7.6→8.06 Hz",
-      "filenameWebm": "NV13_Schumann_Steps_7p83.webm",
-      "filenameAac": "NV13_Schumann_Steps_7p83.m4a",
+      "filenameWebm": "NV13_Schumann_Steps.webm",
+      "filenameAac": "NV13_Schumann_Steps.m4a",
       "durationSec": 2700,
       "targetState": "Remote Viewing",
       "beatHz": 7.83,
@@ -226,13 +250,15 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "Micro-dither around 7.83 Hz with matching AM on the bed for gentle locking."
+      "description": "Micro-dither around 7.83 Hz with matching AM on the bed for gentle locking.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV13_Schumann_Steps.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV13_Schumann_Steps.m4a"
     },
     {
       "id": "nv14-stochastic-dither-6",
       "title": "NV14 • Stochastic Dither 6 Hz",
-      "filenameWebm": "NV14_Stochastic_Dither_6Hz.webm",
-      "filenameAac": "NV14_Stochastic_Dither_6Hz.m4a",
+      "filenameWebm": "NV14_Stochastic_Dither_6.webm",
+      "filenameAac": "NV14_Stochastic_Dither_6.m4a",
       "durationSec": 2700,
       "targetState": "Theta Drift",
       "beatHz": 6,
@@ -243,13 +269,15 @@
         "dither"
       ],
       "gainDb": 0,
-      "description": "6 Hz core with ultra-low white-noise layer for stochastic micro-variation."
+      "description": "6 Hz core with ultra-low white-noise layer for stochastic micro-variation.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV14_Stochastic_Dither_6.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV14_Stochastic_Dither_6.m4a"
     },
     {
       "id": "nv15-hemi-alternator-6-swap10",
       "title": "NV15 • Hemi-Alternator 6 Hz (swap/10s)",
-      "filenameWebm": "NV15_HemiAlternator_6Hz_swap10s.webm",
-      "filenameAac": "NV15_HemiAlternator_6Hz_swap10s.m4a",
+      "filenameWebm": "NV15_Hemi_Alternator_6_swap10.webm",
+      "filenameAac": "NV15_Hemi_Alternator_6_swap10.m4a",
       "durationSec": 2700,
       "targetState": "Hemispheric Balance",
       "beatHz": 6,
@@ -260,7 +288,9 @@
         "pink noise"
       ],
       "gainDb": 0,
-      "description": "6 Hz with alternating ear dominance every 10 s to refresh lateral attention."
+      "description": "6 Hz with alternating ear dominance every 10 s to refresh lateral attention.",
+      "remoteWebmUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV15_Hemi_Alternator_6_swap10.webm",
+      "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/NV15_Hemi_Alternator_6_swap10.m4a"
     },
     {
       "id": "bb-delta-2hz-deep-sleep",
@@ -885,6 +915,6 @@
       "remoteAacUrl": "https://euazsaxsge4uovxr.public.blob.vercel-storage.com/tracks/ap03-full-exit-protocol.m4a"
     }
   ],
-  "lastUpdated": "2026-03-31T16:05:19.265Z",
+  "lastUpdated": "2026-04-02T00:05:27.938Z",
   "totalTracks": 44
 }

@@ -262,7 +262,9 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
     if (isPlaying) {
       pause()
     } else {
-      if (currentTrack?.id !== track.id) {
+      // Always reload if track isn't loaded or audio setup incomplete
+      const state = usePlayer.getState()
+      if (currentTrack?.id !== track.id || !state.activeMediaSlot || !state.audioGraph) {
         await loadTrack(track)
       }
       await play()

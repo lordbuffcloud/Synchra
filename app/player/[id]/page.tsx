@@ -26,12 +26,8 @@ export default function PlayerPage() {
     loadTrackData()
   }, [trackId])
 
-  useEffect(() => {
-    // Auto-load track if it's not already playing
-    if (track && (!currentTrack || currentTrack.id !== track.id)) {
-      loadTrack(track)
-    }
-  }, [track, currentTrack])
+  // Don't auto-load track on mount — AudioContext requires a user gesture.
+  // The Player component handles loading when the user clicks play.
 
   const loadTrackData = async () => {
     try {

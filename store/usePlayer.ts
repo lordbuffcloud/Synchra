@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Track } from '@/types/track'
 import { AudioGraph, NoiseGenerator } from '@/utils/audioGraph'
+import { configureMediaSession, setMediaPlaybackState } from '@/utils/mediaSession'
 
 export interface PlayerState {
   // Current playback state
@@ -12,6 +13,8 @@ export interface PlayerState {
   duration: number
   volume: number
   
+  backgroundEnabled: boolean
+  setBackgroundEnabled: (enabled: boolean) => Promise<void>
   // Player features
   crossfadeDuration: number // 0, 3, 6, 10 seconds
   normalizeEnabled: boolean
@@ -50,7 +53,7 @@ export interface PlayerState {
   
   // Actions
   initializeAudio: () => Promise<void>
-  loadTrack: (track: Track) => Promise<void>
+  loadTrack: (track: Track, autoplay?: boolean) => Promise<void>
   play: () => Promise<void>
   pause: () => void
   seek: (time: number) => void
@@ -78,6 +81,7 @@ const usePlayer = create<PlayerState>()(
       currentTime: 0,
       duration: 0,
       volume: 0.7,
+      backgroundEnabled: true,
       crossfadeDuration: 3,
       normalizeEnabled: true,
       loopEnabled: false,
@@ -121,22 +125,38 @@ const usePlayer = create<PlayerState>()(
           const mediaB = new Audio()
           mediaA.preload = 'auto'
           mediaB.preload = 'auto'
+          mediaA.dataset.playerSlot = 'A'
+          mediaB.dataset.playerSlot = 'B'
+          document.body.append(mediaA, mediaB)
           mediaA.crossOrigin = 'anonymous'
           mediaB.crossOrigin = 'anonymous'
 
-          const sourceA = graph.createMediaElementSource(mediaA)
-          const sourceB = graph.createMediaElementSource(mediaB)
-
-          // Per-slot gain enables track-level normalization (LUFS adjustment).
-          const mediaGainA = graph.getContext().createGain()
-          const mediaGainB = graph.getContext().createGain()
-          mediaGainA.gain.value = 1
-          mediaGainB.gain.value = 1
-
-          sourceA.connect(mediaGainA)
-          sourceB.connect(mediaGainB)
-          mediaGainA.connect(graph.getCrossfader().getInputA())
-          mediaGainB.connect(graph.getCrossfader().getInputB())
+          graph.setVolume(get().volume)
+          for (const media of [mediaA, mediaB]) {
+            media.volume = get().volume
+            media.addEventListener('timeupdate', () => {
+              const active = get().activeMediaSlot === 'A' ? get().mediaA : get().mediaB
+              if (active !== media) return
+              set({ currentTime: media.currentTime })
+              const { timerMinutes, timerStartTime } = get()
+              if (timerMinutes && timerStartTime && Date.now() >= timerStartTime + timerMinutes * 60000) {
+                get().pause()
+                set({ timerStartTime: null })
+              }
+            })
+            media.addEventListener('playing', () => {
+              if ((get().activeMediaSlot === 'A' ? get().mediaA : get().mediaB) !== media) return
+              set({ isPlaying: true })
+              setMediaPlaybackState(true)
+            })
+            const onPause = () => {
+              if ((get().activeMediaSlot === 'A' ? get().mediaA : get().mediaB) !== media || !media.paused) return
+              get().pause()
+            }
+            media.addEventListener('pause', onPause)
+            media.addEventListener('ended', onPause)
+            media.addEventListener('error', onPause)
+          }
 
           set({
             audioGraph: graph,
@@ -144,8 +164,8 @@ const usePlayer = create<PlayerState>()(
             noiseBus,
             mediaA,
             mediaB,
-            mediaGainA,
-            mediaGainB,
+            mediaGainA: null,
+            mediaGainB: null,
             activeMediaSlot: null,
           })
         } catch (error) {
@@ -153,10 +173,11 @@ const usePlayer = create<PlayerState>()(
         }
       },
 
-      loadTrack: async (track: Track) => {
+      loadTrack: async (track: Track, autoplay = false) => {
         let { audioGraph } = get()
         if (!audioGraph) {
-          await get().initializeAudio()
+          // Initialization creates nodes synchronously; retain this tap for native play().
+          void get().initializeAudio()
           audioGraph = get().audioGraph
         }
 
@@ -167,10 +188,24 @@ const usePlayer = create<PlayerState>()(
         set({ isLoading: true, currentTrack: track })
 
         try {
-          await audioGraph.resume()
+          if (!get().backgroundEnabled) {
+            await audioGraph.resume()
+            if (!get().mediaGainA) {
+              const { mediaA, mediaB } = get()
+              const gainA = audioGraph.getContext().createGain()
+              const gainB = audioGraph.getContext().createGain()
+              audioGraph.createMediaElementSource(mediaA!).connect(gainA)
+              audioGraph.createMediaElementSource(mediaB!).connect(gainB)
+              gainA.connect(audioGraph.getCrossfader().getInputA())
+              gainB.connect(audioGraph.getCrossfader().getInputB())
+              mediaA!.volume = 1
+              mediaB!.volume = 1
+              set({ mediaGainA: gainA, mediaGainB: gainB })
+            }
+          }
 
           // Determine codec
-          const supportsOpus = 'MediaSource' in window && MediaSource.isTypeSupported('audio/webm; codecs="opus"')
+          const supportsOpus = !!get().mediaA?.canPlayType('audio/webm; codecs="opus"')
           const trackUrl = supportsOpus
             ? (track.remoteWebmUrl || `/tracks/${track.filenameWebm}`)
             : (track.remoteAacUrl || `/tracks/${track.filenameAac}`)
@@ -186,12 +221,22 @@ const usePlayer = create<PlayerState>()(
           const activeEl = activeMediaSlot === 'A' ? mediaA : mediaB
 
           // Load new source into target slot
-          await new Promise<void>((resolve, reject) => {
+          const loaded = new Promise<void>((resolve, reject) => {
             targetEl.onloadedmetadata = () => resolve()
             targetEl.onerror = () => reject(new Error('Failed to load media'))
             targetEl.src = trackUrl
             targetEl.load()
           })
+
+          let nativePlay: Promise<void> | undefined
+          if (get().backgroundEnabled) {
+            if (activeEl) activeEl.pause()
+            targetEl.loop = get().loopEnabled
+            targetEl.volume = get().volume
+            set({ activeMediaSlot: targetSlot, currentTime: 0, isPlaying: false })
+            if (isPlaying || autoplay) nativePlay = get().play()
+          }
+          await Promise.all([loaded, nativePlay])
 
           // Update duration from the newly loaded media
           set({ duration: targetEl.duration || track.durationSec, isLoading: false })
@@ -206,7 +251,9 @@ const usePlayer = create<PlayerState>()(
             targetGain.gain.setTargetAtTime(linearGain, now, 0.05)
           }
 
-          if (!activeMediaSlot) {
+          if (get().backgroundEnabled) {
+            // Native playback already started synchronously within the user's tap.
+          } else if (!activeMediaSlot) {
             // First load: set active slot but do not auto-play
             set({ activeMediaSlot: targetSlot })
           } else if (isPlaying) {
@@ -219,8 +266,11 @@ const usePlayer = create<PlayerState>()(
             set({ activeMediaSlot: targetSlot })
           } else {
             // Not playing: switch active slot to target for next play
-            set({ activeMediaSlot: targetSlot })
+            audioGraph.getCrossfader().select(targetSlot)
+            set({ activeMediaSlot: targetSlot, currentTime: 0 })
           }
+
+          if (autoplay && !get().backgroundEnabled && !isPlaying) await get().play()
 
           // Add to recent tracks
           get().addToRecent(track.id)
@@ -236,11 +286,19 @@ const usePlayer = create<PlayerState>()(
         const { currentTrack, audioGraph, loopEnabled, timerMinutes, mediaA, mediaB, activeMediaSlot } = get()
         if (!currentTrack || !audioGraph || !mediaA || !mediaB || !activeMediaSlot) return
 
-        await audioGraph.resume()
+        if (!get().backgroundEnabled) await audioGraph.resume()
 
+        configureMediaSession(currentTrack.title, {
+          play: () => { void get().play().catch(console.error) }, pause: () => get().pause(),
+          stop: () => { get().pause(); get().seek(0) },
+          seekto: ({ seekTime }) => { if (seekTime !== undefined) get().seek(seekTime) },
+          seekbackward: ({ seekOffset }) => get().seek(get().currentTime - (seekOffset || 10)),
+          seekforward: ({ seekOffset }) => get().seek(get().currentTime + (seekOffset || 10)),
+        })
         const active = activeMediaSlot === 'A' ? mediaA : mediaB
         active.loop = !!loopEnabled
-        await active.play()
+        try { await active.play() }
+        catch (error) { set({ isPlaying: false }); setMediaPlaybackState(false); throw error }
         
         // Start session tracking
         const sessionStart = Date.now()
@@ -254,21 +312,14 @@ const usePlayer = create<PlayerState>()(
           set({ timerStartTime: Date.now(), timerTimeoutId: timeoutId })
         }
 
-        const step = () => {
-          const { isPlaying } = get()
-          if (!isPlaying) return
-          set({ currentTime: active.currentTime })
-          const rafId = requestAnimationFrame(step)
-          set({ rafId })
-        }
-        step()
+
       },
 
       pause: () => {
         const { mediaA, mediaB, rafId, sessionStartTime, currentTrack, timerTimeoutId } = get()
         if (rafId) cancelAnimationFrame(rafId)
-        if (mediaA) mediaA.pause()
-        if (mediaB) mediaB.pause()
+        if (mediaA && !mediaA.paused) mediaA.pause()
+        if (mediaB && !mediaB.paused) mediaB.pause()
 
         if (timerTimeoutId) {
           window.clearTimeout(timerTimeoutId)
@@ -289,7 +340,8 @@ const usePlayer = create<PlayerState>()(
           }
         }
         
-        set({ isPlaying: false, rafId: null, sessionStartTime: null, timerTimeoutId: null })
+        setMediaPlaybackState(false)
+        set({ timerStartTime: null, isPlaying: false, rafId: null, sessionStartTime: null, timerTimeoutId: null })
       },
 
       seek: (time: number) => {
@@ -306,8 +358,31 @@ const usePlayer = create<PlayerState>()(
       setVolume: (volume: number) => {
         const { audioGraph } = get()
         set({ volume })
-        if (audioGraph) {
-          audioGraph.setVolume(volume)
+        if (audioGraph) audioGraph.setVolume(volume)
+        if (get().backgroundEnabled) {
+          if (get().mediaA) get().mediaA!.volume = volume
+          if (get().mediaB) get().mediaB!.volume = volume
+        }
+      },
+
+      setBackgroundEnabled: async (enabled: boolean) => {
+        const { currentTrack, currentTime, isPlaying, audioGraph } = get()
+        get().pause()
+        get().noiseGenerator?.stop()
+        for (const media of [get().mediaA, get().mediaB]) {
+          media?.removeAttribute('src')
+          media?.load()
+          media?.remove()
+        }
+        // A MediaElementAudioSource cannot be undone. Replace the elements/graph on mode changes.
+        if (audioGraph) void audioGraph.getContext().close()
+        set({ backgroundEnabled: enabled, audioGraph: null, mediaA: null, mediaB: null,
+          mediaGainA: null, mediaGainB: null, activeMediaSlot: null, noiseGenerator: null, noiseBus: null })
+        await get().initializeAudio()
+        if (currentTrack) {
+          await get().loadTrack(currentTrack)
+          get().seek(currentTime)
+          if (isPlaying) await get().play()
         }
       },
 
@@ -329,6 +404,8 @@ const usePlayer = create<PlayerState>()(
 
       setLoopEnabled: (enabled: boolean) => {
         set({ loopEnabled: enabled })
+        if (get().mediaA) get().mediaA!.loop = enabled
+        if (get().mediaB) get().mediaB!.loop = enabled
       },
 
       setTimer: (minutes: number | null) => {
@@ -343,7 +420,7 @@ const usePlayer = create<PlayerState>()(
         const { noiseGenerator } = get()
         set({ noiseType: type })
         
-        if (noiseGenerator) {
+        if (noiseGenerator && !get().backgroundEnabled) {
           if (type) {
             noiseGenerator.setType(type)
             noiseGenerator.start()
@@ -400,6 +477,7 @@ const usePlayer = create<PlayerState>()(
       },
 
       reset: () => {
+        get().pause()
         const { currentSource, audioGraph, noiseGenerator, sessionStartTime, currentTrack, timerTimeoutId } = get()
         
         // Track final session if active
@@ -445,6 +523,7 @@ const usePlayer = create<PlayerState>()(
     {
       name: 'synchra-player',
       partialize: (state) => ({
+        backgroundEnabled: state.backgroundEnabled,
         volume: state.volume,
         crossfadeDuration: state.crossfadeDuration,
         normalizeEnabled: state.normalizeEnabled,

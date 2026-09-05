@@ -9,7 +9,8 @@ export default defineConfig({
   reporter: 'html',
   
   use: {
-    baseURL: 'http://localhost:3100',
+    baseURL: 'http://127.0.0.1:3100',
+    launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH },
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -22,9 +23,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'pnpm dev -p 3100',
+    command: 'npm run dev -- --port 3100',
     url: 'http://localhost:3100',
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
 });

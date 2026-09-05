@@ -34,6 +34,12 @@ export type BinauralPreset = {
   tags?: string[]
 }
 
+function holdParameter(param: AudioParam, time: number) {
+  const value = param.value
+  if (typeof param.cancelAndHoldAtTime === 'function') param.cancelAndHoldAtTime(time)
+  else { param.cancelScheduledValues(time); param.setValueAtTime(value, time) }
+}
+
 export class BinauralBeatSynth {
   private ctx: AudioContext
   private destination: AudioNode
@@ -46,6 +52,7 @@ export class BinauralBeatSynth {
   private leftGain?: GainNode
   private rightGain?: GainNode
   private outGain?: GainNode
+  private envelopeGain?: GainNode
 
   private hrvOsc?: OscillatorNode
   private hrvGain?: GainNode
@@ -95,9 +102,12 @@ export class BinauralBeatSynth {
 
     // Output gain with a soft fade-in (hearing safety + click avoidance).
     this.outGain = this.ctx.createGain()
-    this.outGain.gain.setValueAtTime(0, now)
-    this.outGain.gain.linearRampToValueAtTime(Math.max(0, Math.min(initialLevel, 0.35)), now + 0.25)
-    this.outGain.connect(this.destination)
+    this.outGain.gain.value = 1
+    this.envelopeGain = this.ctx.createGain()
+    this.envelopeGain.gain.setValueAtTime(0, now)
+    this.envelopeGain.gain.linearRampToValueAtTime(Math.max(0, Math.min(initialLevel, 0.35)), now + 0.25)
+    this.outGain.connect(this.envelopeGain)
+    this.envelopeGain.connect(this.destination)
 
     // Per-ear chain
     this.leftOsc = this.ctx.createOscillator()
@@ -184,7 +194,7 @@ export class BinauralBeatSynth {
     this.isoGain.connect(this.outGain.gain)
 
     this.isoOsc = this.ctx.createOscillator()
-    this.isoOsc.type = 'square' // square wave for sharp on/off pulsing
+    this.isoOsc.type = 'sine' // square wave for sharp on/off pulsing
     this.isoOsc.frequency.value = 0
     this.isoOsc.connect(this.isoGain)
     this.isoOsc.start()
@@ -225,20 +235,20 @@ export class BinauralBeatSynth {
   }
 
   setOutputLevel(nextLevel: number) {
-    if (!this.outGain) return
+    if (!this.envelopeGain) return
     const v = Math.max(0, Math.min(nextLevel, 0.35))
     const now = this.ctx.currentTime
-    this.outGain.gain.setTargetAtTime(v, now, 0.05)
+    holdParameter(this.envelopeGain.gain, now)
+    this.envelopeGain.gain.setTargetAtTime(v, now, 0.05)
   }
 
   stop() {
     if (!this.started) return
     const now = this.ctx.currentTime
 
-    if (this.outGain) {
-      const current = this.outGain.gain.value
-      this.outGain.gain.setValueAtTime(current, now)
-      this.outGain.gain.linearRampToValueAtTime(0, now + 0.2)
+    if (this.envelopeGain) {
+      holdParameter(this.envelopeGain.gain, now)
+      this.envelopeGain.gain.linearRampToValueAtTime(0, now + 0.2)
     }
 
     const stopNode = (n?: OscillatorNode) => {
@@ -261,9 +271,8 @@ export class BinauralBeatSynth {
     stopNode(this.leftOsc2)
     stopNode(this.rightOsc2)
 
-    // Disconnect a bit later (after fade)
-    window.setTimeout(() => {
-      ;[
+    // Capture old nodes so rapid restart cannot disconnect the new session.
+    const retiredNodes = [
         this.leftOsc,
         this.rightOsc,
         this.leftPan,
@@ -291,43 +300,38 @@ export class BinauralBeatSynth {
         this.rightPan2,
         this.leftGain2,
         this.rightGain2,
-      ].forEach((n: any) => {
-        try {
-          n?.disconnect?.()
-        } catch {
-          // ignore
-        }
-      })
-
-      this.leftOsc = undefined
-      this.rightOsc = undefined
-      this.leftPan = undefined
-      this.rightPan = undefined
-      this.leftGain = undefined
-      this.rightGain = undefined
-      this.outGain = undefined
-      this.hrvOsc = undefined
-      this.hrvGain = undefined
-      this.outAmOsc = undefined
-      this.outAmGain = undefined
-      this.itdOsc = undefined
-      this.rightDelay = undefined
-      this.itdDepth = undefined
-      this.hemiOsc = undefined
-      this.hemiDepthL = undefined
-      this.hemiDepthR = undefined
-      this.noiseAmOsc = undefined
-      this.noiseAmGain = undefined
-      this.isoOsc = undefined
-      this.isoGain = undefined
-      this.leftOsc2 = undefined
-      this.rightOsc2 = undefined
-      this.leftPan2 = undefined
-      this.rightPan2 = undefined
-      this.leftGain2 = undefined
-      this.rightGain2 = undefined
-      this.started = false
-    }, 300)
+      this.envelopeGain,
+    ]
+    this.leftOsc = undefined
+    this.rightOsc = undefined
+    this.leftPan = undefined
+    this.rightPan = undefined
+    this.leftGain = undefined
+    this.rightGain = undefined
+    this.outGain = undefined
+    this.hrvOsc = undefined
+    this.hrvGain = undefined
+    this.outAmOsc = undefined
+    this.outAmGain = undefined
+    this.itdOsc = undefined
+    this.rightDelay = undefined
+    this.itdDepth = undefined
+    this.hemiOsc = undefined
+    this.hemiDepthL = undefined
+    this.hemiDepthR = undefined
+    this.noiseAmOsc = undefined
+    this.noiseAmGain = undefined
+    this.isoOsc = undefined
+    this.isoGain = undefined
+    this.leftOsc2 = undefined
+    this.rightOsc2 = undefined
+    this.leftPan2 = undefined
+    this.rightPan2 = undefined
+    this.leftGain2 = undefined
+    this.rightGain2 = undefined
+    this.envelopeGain = undefined
+    this.started = false
+    window.setTimeout(() => retiredNodes.forEach(node => node?.disconnect()), 300)
   }
 
   applyPreset(preset: BinauralPreset) {
@@ -336,6 +340,9 @@ export class BinauralBeatSynth {
     const now = this.ctx.currentTime
     const base = preset.baseHz
     const beat = preset.beatHz
+
+    holdParameter(this.leftOsc.frequency, now)
+    holdParameter(this.rightOsc.frequency, now)
 
     // Default binaural method: base ± beat/2
     const leftHz = Math.max(20, base - beat / 2)
@@ -360,7 +367,7 @@ export class BinauralBeatSynth {
     // HRV envelope (0.1 Hz default). Adds a small +/- modulation to output gain.
     const hrvHz = preset.hrvHz ?? 0
     if (this.hrvGain) {
-      this.hrvGain.gain.setTargetAtTime(hrvHz ? 0.03 : 0, now, 0.05)
+      this.hrvGain.gain.setTargetAtTime(hrvHz ? 0.16 : 0, now, 0.05)
     }
     if (hrvHz) {
       if (!this.hrvOsc) {
@@ -383,7 +390,7 @@ export class BinauralBeatSynth {
     const outAmHz = preset.outAmHz ?? preset.gammaAmHz ?? 0
     const outAmDepth = preset.outAmDepth ?? 0.015
     if (this.outAmGain) {
-      this.outAmGain.gain.setTargetAtTime(outAmHz ? outAmDepth : 0, now, 0.05)
+      this.outAmGain.gain.setTargetAtTime(outAmHz ? Math.min(0.8, outAmDepth / 0.18) : 0, now, 0.05)
     }
     if (outAmHz) {
       if (!this.outAmOsc) {
@@ -406,7 +413,8 @@ export class BinauralBeatSynth {
     const itdMs = preset.microItdMs ?? 0
     if (this.itdDepth) {
       const depthSeconds = Math.max(0, Math.min(itdMs, 5)) / 1000
-      this.itdDepth.gain.setTargetAtTime(depthSeconds, now, 0.2)
+      this.itdDepth.gain.setTargetAtTime(depthSeconds / 2, now, 0.2)
+      this.rightDelay?.delayTime.setTargetAtTime(depthSeconds / 2, now, 0.2)
     }
 
     // Hemi alternator: swap/seconds (approx). We use a sine LFO and invert it for R.
@@ -437,7 +445,7 @@ export class BinauralBeatSynth {
     const isoHz = preset.isochronicHz ?? 0
     const isoDepth = preset.isochronicDepth ?? 0.02
     if (this.isoOsc && this.isoGain) {
-      this.isoGain.gain.setTargetAtTime(isoHz ? isoDepth : 0, now, 0.1)
+      this.isoGain.gain.setTargetAtTime(isoHz ? Math.min(0.8, isoDepth / 0.18) : 0, now, 0.1)
       this.isoOsc.frequency.setTargetAtTime(isoHz || 0, now, 0.1)
     }
 

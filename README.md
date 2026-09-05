@@ -36,6 +36,16 @@ A production-ready binaural beats web application built with Next.js 14, featuri
 - **Metadata inference** - Extract frequency, state, and tags from filenames
 - **Idempotent builds** - Only process changed files, clean stale outputs
 
+## Background playback and audio quality
+
+- **Library:** Background playback is enabled by default. Tracks play directly through the browser media player, without an AudioContext in the signal path. Lock-screen play/pause and seeking are provided where supported. Use the phone's hardware volume controls on iOS. Turn Background playback off in Player Settings to use live normalization, crossfading, and the extra noise layer. The original stereo recordings are preserved; this change does not remaster uploaded tracks.
+- **Studio:** Background playback streams a 44.1 kHz, 16-bit stereo session from `/api/studio-audio`. Preset ramps, secondary tones, modulation and the selected noise bed are rendered into the sound, so page timers are not needed. Sessions use the preset duration (up to 90 minutes), with 250 ms cosine attack/release and output headroom. This requires connectivity and transfers about 11 MB per minute; prefer Wi-Fi for long sessions. Switching this option off retains local live synthesis.
+- **Quality:** Frequency ramps integrate phase continuously, left/right carriers remain separate, output gating is smoothed, and PCM uses deterministic dither. The live synthesizer now fades after modulation, correctly mutes at zero level, cancels stale frequency ramps, and safely handles rapid stop/start. These are audio engineering improvements, not claims of stronger therapeutic effects.
+
+Keep the browser tab open when changing apps or locking the phone. The operating system can still interrupt playback for calls, competing audio, power management, or browser termination. Physical iPhone and Android screen-lock testing remains necessary. JavaScript sleep timers are best-effort in the background; Studio's rendered session endpoint is timed in the audio itself.
+
+Validation: `npm run typecheck`, `npm run lint`, `npm run build`, `npx tsx --test tests/studio-audio.test.ts`, and `npx playwright test playwright/tests/background-audio.spec.ts`. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` only when using a system Chromium installation.
+
 ## Quick Start
 
 ### Prerequisites

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Header from '@/components/Header'
+import BackgroundStudioPlayer from '@/components/BackgroundStudioPlayer'
+import { PRESETS } from '@/content/studioPresets'
 import usePlayer from '@/store/usePlayer'
 import { BinauralBeatSynth, BinauralPreset } from '@/utils/binauralSynth'
 import { Play, Pause, Headphones, Waves, Sparkles, Brain, Moon, Sun, Zap, Eye, Wind, ChevronDown, ChevronUp, Clock, Shield } from 'lucide-react'
@@ -18,422 +20,6 @@ const NOISE_OPTIONS: Array<{ type: NoiseTypeOption; label: string; description: 
 // ─── RESEARCH-BACKED PRESETS ─────────────────────────────────────────────────
 // Organized by brainwave category with scientifically-validated frequencies.
 // Each preset includes research context, recommended duration, and intensity.
-
-const PRESETS: BinauralPreset[] = [
-  // ═══ DELTA (0.5-4 Hz) — Deep Sleep & Recovery ═══
-  {
-    id: 'delta-2hz-deep-sleep',
-    name: 'Deep Sleep 2 Hz',
-    description: 'Stage 3-4 NREM sleep frequency. Promotes growth hormone release and deep physical restoration.',
-    beatHz: 2,
-    baseHz: 180,
-    category: 'delta',
-    hrvHz: 0.067, // ~4 breaths/min for sleep
-    noiseAmHz: 2,
-    noiseAmDepth: 0.04,
-    recommendedMinutes: 60,
-    intensity: 'deep',
-    tags: ['sleep', 'recovery', 'growth-hormone'],
-  },
-  {
-    id: 'delta-3hz-restoration',
-    name: 'Delta Gate 3 Hz',
-    description: 'Heavier delta core for sleep onset. Immune system restoration and cellular repair.',
-    beatHz: 3,
-    baseHz: 200,
-    category: 'delta',
-    noiseAmHz: 3,
-    noiseAmDepth: 0.05,
-    recommendedMinutes: 90,
-    intensity: 'deep',
-    tags: ['sleep', 'immune', 'restoration'],
-  },
-  {
-    id: 'delta-1hz-dreamless',
-    name: 'Dreamless Deep 1 Hz',
-    description: 'Lowest practical delta frequency. Associated with deepest unconscious healing states.',
-    beatHz: 1,
-    baseHz: 160,
-    category: 'delta',
-    hrvHz: 0.05,
-    recommendedMinutes: 45,
-    intensity: 'deep',
-    tags: ['deep-sleep', 'healing', 'unconscious'],
-  },
-  {
-    id: 'delta-ramp-theta-to-delta',
-    name: 'Sleep Ramp 6→2 Hz',
-    description: 'Gradual theta-to-delta descent mimicking natural sleep onset. 15-minute guided descent.',
-    beatHz: 2,
-    baseHz: 190,
-    category: 'delta',
-    ramp: { fromHz: 6, toHz: 2, seconds: 15 * 60 },
-    hrvHz: 0.08,
-    noiseAmHz: 4,
-    noiseAmDepth: 0.04,
-    recommendedMinutes: 45,
-    intensity: 'gentle',
-    tags: ['sleep-onset', 'ramp', 'gradual'],
-  },
-
-  // ═══ THETA (4-8 Hz) — Meditation & Creativity ═══
-  {
-    id: 'theta-6hz-meditation',
-    name: 'Theta Stabilizer 6 Hz',
-    description: 'Core theta for deep meditation. Facilitates insight, creativity, and emotional processing.',
-    beatHz: 6,
-    baseHz: 220,
-    category: 'theta',
-    recommendedMinutes: 30,
-    intensity: 'moderate',
-    tags: ['meditation', 'creativity', 'insight'],
-  },
-  {
-    id: 'theta-4.5hz-deep',
-    name: 'Deep Theta 4.5 Hz',
-    description: 'Border of delta/theta. Hypnagogic gateway frequency for vivid imagery and lucid states.',
-    beatHz: 4.5,
-    baseHz: 210,
-    category: 'theta',
-    hrvHz: 0.1,
-    microItdMs: 1.5,
-    recommendedMinutes: 30,
-    intensity: 'deep',
-    tags: ['hypnagogic', 'lucid', 'imagery'],
-  },
-  {
-    id: 'theta-cfc-gamma',
-    name: 'CFC: Theta 6 + Gamma 40',
-    description: 'Cross-frequency coupling (theta-gamma). Research links this pattern to memory consolidation and cognitive binding.',
-    beatHz: 6,
-    baseHz: 220,
-    category: 'theta',
-    gammaAmHz: 40,
-    outAmDepth: 0.018,
-    recommendedMinutes: 20,
-    intensity: 'moderate',
-    tags: ['memory', 'cfc', 'cognitive-binding'],
-  },
-  {
-    id: 'theta-micro-itd',
-    name: 'Spatial Theta 6 Hz',
-    description: 'Micro interaural time delay creates spacious, 3D perception. Enhances meditation depth.',
-    beatHz: 6,
-    baseHz: 220,
-    category: 'theta',
-    microItdMs: 2,
-    recommendedMinutes: 25,
-    intensity: 'moderate',
-    tags: ['spatial', 'meditation', '3d-audio'],
-  },
-  {
-    id: 'theta-hemi-alt',
-    name: 'Hemi-Alternator 6 Hz',
-    description: 'Alternates emphasis between hemispheres every 10s. Refreshes attention without disrupting theta state.',
-    beatHz: 6,
-    baseHz: 220,
-    category: 'theta',
-    hemiSwapSeconds: 10,
-    recommendedMinutes: 30,
-    intensity: 'moderate',
-    tags: ['hemispheric', 'balance', 'alternating'],
-  },
-  {
-    id: 'theta-spindle-bridge',
-    name: 'Spindle Bridge 13 Hz AM',
-    description: 'Theta with subtle 13 Hz spindle modulation. Sleep spindles consolidate memory during stage 2 sleep.',
-    beatHz: 6,
-    baseHz: 220,
-    category: 'theta',
-    outAmHz: 13,
-    outAmDepth: 0.012,
-    recommendedMinutes: 30,
-    intensity: 'moderate',
-    tags: ['spindle', 'memory', 'sleep-stage-2'],
-  },
-  {
-    id: 'theta-5hz-creativity',
-    name: 'Creative Flow 5 Hz',
-    description: 'Mid-theta optimized for creative problem-solving. Used in Monroe Institute protocols for insight access.',
-    beatHz: 5,
-    baseHz: 215,
-    category: 'theta',
-    hrvHz: 0.1,
-    hemiSwapSeconds: 15,
-    recommendedMinutes: 25,
-    intensity: 'moderate',
-    tags: ['creativity', 'problem-solving', 'insight'],
-  },
-
-  // ═══ ALPHA (8-12 Hz) — Relaxed Focus & Flow ═══
-  {
-    id: 'alpha-schumann',
-    name: 'Schumann Hold 7.83 Hz',
-    description: "Earth's electromagnetic resonance frequency. Promotes calm grounding and parasympathetic activation.",
-    beatHz: 7.83,
-    baseHz: 220,
-    category: 'alpha',
-    hrvHz: 0.1,
-    noiseAmHz: 7.83,
-    noiseAmDepth: 0.06,
-    recommendedMinutes: 30,
-    intensity: 'gentle',
-    tags: ['schumann', 'grounding', 'calm'],
-  },
-  {
-    id: 'alpha-10hz-peak',
-    name: 'Peak Alpha 10 Hz',
-    description: 'Individual alpha peak frequency. Optimal for relaxed alertness, flow state, and learning readiness.',
-    beatHz: 10,
-    baseHz: 220,
-    category: 'alpha',
-    hrvHz: 0.1,
-    recommendedMinutes: 30,
-    intensity: 'gentle',
-    tags: ['flow', 'learning', 'relaxed-focus'],
-  },
-  {
-    id: 'alpha-ramp-12to7.83',
-    name: 'Primer Ramp 12→7.83 Hz',
-    description: 'Gentle alpha-to-Schumann glide over 8 minutes. Eases from alertness into calm meditative readiness.',
-    beatHz: 7.83,
-    baseHz: 220,
-    category: 'alpha',
-    ramp: { fromHz: 12, toHz: 7.83, seconds: 8 * 60 },
-    hrvHz: 0.1,
-    noiseAmHz: 7.83,
-    noiseAmDepth: 0.05,
-    recommendedMinutes: 30,
-    intensity: 'gentle',
-    tags: ['ramp', 'primer', 'alpha-to-theta'],
-  },
-  {
-    id: 'alpha-8hz-relaxation',
-    name: 'Deep Relaxation 8 Hz',
-    description: 'Low alpha for deep relaxation without drowsiness. Enhances creativity and reduces anxiety.',
-    beatHz: 8,
-    baseHz: 216,
-    category: 'alpha',
-    hrvHz: 0.1,
-    noiseAmHz: 8,
-    noiseAmDepth: 0.04,
-    recommendedMinutes: 20,
-    intensity: 'gentle',
-    tags: ['relaxation', 'anxiety-relief', 'calm'],
-  },
-
-  // ═══ BETA (12-30 Hz) — Focus & Concentration ═══
-  {
-    id: 'beta-14hz-smr',
-    name: 'SMR Focus 14 Hz',
-    description: 'Sensorimotor rhythm (12-15 Hz). Enhances focus and calm concentration. Used in ADHD neurofeedback protocols.',
-    beatHz: 14,
-    baseHz: 250,
-    category: 'beta',
-    recommendedMinutes: 30,
-    intensity: 'moderate',
-    tags: ['focus', 'smr', 'adhd', 'concentration'],
-  },
-  {
-    id: 'beta-18hz-active-focus',
-    name: 'Active Focus 18 Hz',
-    description: 'Mid-beta for engaged analytical thinking. Enhances problem-solving and sustained attention.',
-    beatHz: 18,
-    baseHz: 270,
-    category: 'beta',
-    hrvHz: 0.1,
-    recommendedMinutes: 25,
-    intensity: 'moderate',
-    tags: ['focus', 'analytical', 'problem-solving'],
-  },
-  {
-    id: 'beta-20hz-peak',
-    name: 'Peak Performance 20 Hz',
-    description: 'High-beta for peak cognitive output. Best for demanding tasks requiring intense concentration.',
-    beatHz: 20,
-    baseHz: 280,
-    category: 'beta',
-    isochronicHz: 20,
-    isochronicDepth: 0.01,
-    recommendedMinutes: 20,
-    intensity: 'intense',
-    tags: ['peak-performance', 'intense-focus', 'demanding-tasks'],
-  },
-  {
-    id: 'beta-ramp-alpha-to-beta',
-    name: 'Wake-Up Ramp 8→18 Hz',
-    description: 'Morning activation ramp from alpha to beta over 10 minutes. Gentle cognitive warm-up.',
-    beatHz: 18,
-    baseHz: 260,
-    category: 'beta',
-    ramp: { fromHz: 8, toHz: 18, seconds: 10 * 60 },
-    recommendedMinutes: 15,
-    intensity: 'gentle',
-    tags: ['morning', 'wake-up', 'activation'],
-  },
-
-  // ═══ GAMMA (30-100 Hz) — Cognition & Peak States ═══
-  {
-    id: 'gamma-40hz-cognition',
-    name: 'Gamma 40 Hz Cognition',
-    description: '40 Hz gamma linked to cognitive binding and information integration. Research shows neuroprotective effects.',
-    beatHz: 40,
-    baseHz: 300,
-    category: 'gamma',
-    hrvHz: 0.1,
-    recommendedMinutes: 15,
-    intensity: 'intense',
-    tags: ['cognition', 'neuroprotection', '40hz-protocol'],
-  },
-  {
-    id: 'gamma-40hz-mit',
-    name: 'MIT 40 Hz Protocol',
-    description: 'Based on MIT research showing 40 Hz stimulation reduces amyloid plaques. Gentle isochronic overlay for enhanced entrainment.',
-    beatHz: 40,
-    baseHz: 300,
-    category: 'gamma',
-    isochronicHz: 40,
-    isochronicDepth: 0.015,
-    hrvHz: 0.1,
-    recommendedMinutes: 60,
-    intensity: 'moderate',
-    tags: ['mit-protocol', 'neuroprotection', 'amyloid'],
-  },
-  {
-    id: 'gamma-32hz-insight',
-    name: 'Insight Gamma 32 Hz',
-    description: 'Low gamma associated with sudden insights and "aha" moments. Use during creative problem-solving.',
-    beatHz: 32,
-    baseHz: 280,
-    category: 'gamma',
-    recommendedMinutes: 15,
-    intensity: 'moderate',
-    tags: ['insight', 'aha-moments', 'creativity'],
-  },
-
-  // ═══ ADVANCED PROTOCOLS ═══
-  {
-    id: 'adv-gateway-focus10',
-    name: 'Focus 10: Mind Awake, Body Asleep',
-    description: 'Inspired by Monroe Institute Focus 10. Theta core with alpha bridge maintains mental awareness while body relaxes deeply.',
-    beatHz: 4.5,
-    baseHz: 200,
-    category: 'advanced',
-    secondaryBeatHz: 10,
-    hrvHz: 0.1,
-    hemiSwapSeconds: 12,
-    recommendedMinutes: 30,
-    intensity: 'deep',
-    tags: ['gateway', 'monroe', 'focus-10', 'obe'],
-  },
-  {
-    id: 'adv-gateway-focus12',
-    name: 'Focus 12: Expanded Awareness',
-    description: 'Monroe Focus 12 state. Deeper theta with gamma overlay for expanded perception beyond physical senses.',
-    beatHz: 4,
-    baseHz: 200,
-    category: 'advanced',
-    gammaAmHz: 40,
-    outAmDepth: 0.012,
-    hemiSwapSeconds: 8,
-    microItdMs: 2,
-    recommendedMinutes: 30,
-    intensity: 'deep',
-    tags: ['gateway', 'monroe', 'focus-12', 'expanded'],
-  },
-  {
-    id: 'adv-lucid-dream',
-    name: 'Lucid Dream Induction',
-    description: 'Theta-gamma coupling for lucid dream induction. 40 Hz gamma maintains awareness while theta promotes dream state.',
-    beatHz: 5.5,
-    baseHz: 210,
-    category: 'advanced',
-    gammaAmHz: 40,
-    outAmDepth: 0.02,
-    ramp: { fromHz: 8, toHz: 5.5, seconds: 10 * 60 },
-    recommendedMinutes: 45,
-    intensity: 'deep',
-    tags: ['lucid-dreaming', 'awareness', 'theta-gamma'],
-  },
-  {
-    id: 'adv-whole-brain',
-    name: 'Whole Brain Sync',
-    description: 'Dual-frequency protocol with hemispheric alternation. Promotes bilateral brain coherence and integration.',
-    beatHz: 7.83,
-    baseHz: 220,
-    category: 'advanced',
-    secondaryBeatHz: 14,
-    hemiSwapSeconds: 8,
-    hrvHz: 0.1,
-    recommendedMinutes: 25,
-    intensity: 'moderate',
-    tags: ['whole-brain', 'coherence', 'bilateral'],
-  },
-  {
-    id: 'adv-flow-state',
-    name: 'Flow State Protocol',
-    description: 'Alpha-theta border with subtle gamma. This crossover zone is where flow states emerge in neurofeedback research.',
-    beatHz: 8,
-    baseHz: 230,
-    category: 'advanced',
-    gammaAmHz: 40,
-    outAmDepth: 0.008,
-    hrvHz: 0.1,
-    recommendedMinutes: 45,
-    intensity: 'moderate',
-    tags: ['flow', 'peak-performance', 'alpha-theta-crossover'],
-  },
-
-  // ═══ SOLFEGGIO-CARRIER PRESETS ═══
-  {
-    id: 'solf-528-theta',
-    name: '528 Hz Carrier + Theta',
-    description: '528 Hz "transformation" frequency as carrier with 6 Hz theta beat. Combines solfeggio resonance with theta entrainment.',
-    beatHz: 6,
-    baseHz: 528,
-    category: 'solfeggio',
-    hrvHz: 0.1,
-    recommendedMinutes: 30,
-    intensity: 'gentle',
-    tags: ['528hz', 'solfeggio', 'transformation', 'healing'],
-  },
-  {
-    id: 'solf-432-alpha',
-    name: '432 Hz Carrier + Alpha',
-    description: '432 Hz "natural tuning" carrier with 10 Hz alpha beat. Gentle, harmonious relaxation.',
-    beatHz: 10,
-    baseHz: 432,
-    category: 'solfeggio',
-    hrvHz: 0.1,
-    recommendedMinutes: 30,
-    intensity: 'gentle',
-    tags: ['432hz', 'natural-tuning', 'harmony'],
-  },
-  {
-    id: 'solf-396-delta',
-    name: '396 Hz Carrier + Delta',
-    description: '396 Hz "liberation" frequency with 2.5 Hz delta. Deep release and letting go.',
-    beatHz: 2.5,
-    baseHz: 396,
-    category: 'solfeggio',
-    hrvHz: 0.067,
-    recommendedMinutes: 45,
-    intensity: 'deep',
-    tags: ['396hz', 'solfeggio', 'liberation', 'release'],
-  },
-  {
-    id: 'solf-639-theta',
-    name: '639 Hz Carrier + Theta',
-    description: '639 Hz "connection" frequency with 7 Hz theta. Heart-centered meditation and emotional harmonizing.',
-    beatHz: 7,
-    baseHz: 639,
-    category: 'solfeggio',
-    hrvHz: 0.1,
-    recommendedMinutes: 25,
-    intensity: 'gentle',
-    tags: ['639hz', 'solfeggio', 'connection', 'heart'],
-  },
-]
 
 // Category metadata for UI
 const CATEGORIES = [
@@ -457,6 +43,7 @@ const intensityColors: Record<string, string> = {
 export default function StudioPage() {
   const { initializeAudio, audioGraph, noiseBus, noiseType, noiseVolume, setNoiseType, setNoiseVolume } = usePlayer()
   const [presetId, setPresetId] = useState(PRESETS[0]!.id)
+  const [backgroundPlayback, setBackgroundPlayback] = useState(true)
   const [isRunning, setIsRunning] = useState(false)
   const [level, setLevel] = useState(0.18)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -473,15 +60,15 @@ export default function StudioPage() {
   const [synth, setSynth] = useState<BinauralBeatSynth | null>(null)
 
   useEffect(() => {
-    initializeAudio()
-  }, [initializeAudio])
+    if (!backgroundPlayback) initializeAudio()
+  }, [initializeAudio, backgroundPlayback])
 
   useEffect(() => {
-    if (!audioGraph) return
+    if (!audioGraph || backgroundPlayback) return
     if (!synth) {
       setSynth(new BinauralBeatSynth(audioGraph.getContext(), audioGraph.getMasterGain(), { noiseBus: noiseBus || undefined }))
     }
-  }, [audioGraph, noiseBus, synth])
+  }, [audioGraph, noiseBus, synth, backgroundPlayback])
 
   useEffect(() => {
     if (synth?.isStarted()) {
@@ -495,8 +82,20 @@ export default function StudioPage() {
     }
   }, [synth])
 
+  useEffect(() => {
+    const noise = usePlayer.getState().noiseGenerator
+    if (!backgroundPlayback && isRunning && noiseType && noise) {
+      noise.setType(noiseType)
+      noise.setVolume(noiseVolume)
+      noise.start()
+    } else { noise?.stop() }
+    return () => noise?.stop()
+  }, [backgroundPlayback, isRunning, noiseType, noiseVolume])
+
   const toggle = async () => {
+    usePlayer.getState().pause()
     await initializeAudio()
+    const audioGraph = usePlayer.getState().audioGraph
     if (!audioGraph) return
 
     const s =
@@ -549,6 +148,18 @@ export default function StudioPage() {
               Safety: start low volume; avoid use while driving; stop if you feel discomfort.
             </span>
           </div>
+        </section>
+
+        <section className="mb-6">
+          <label className="flex gap-3 items-center">
+            <input type="checkbox" checked={backgroundPlayback} onChange={e => {
+              synth?.stop()
+              setIsRunning(false)
+              setBackgroundPlayback(e.target.checked)
+            }} />
+            Background playback
+          </label>
+          {backgroundPlayback && <BackgroundStudioPlayer preset={preset} level={level} noise={noiseType} noiseLevel={noiseVolume} />}
         </section>
 
         {/* Category Tabs */}
@@ -670,7 +281,7 @@ export default function StudioPage() {
                   </div>
 
                   {/* Play/Stop button */}
-                  <button
+                  {!backgroundPlayback && (<button
                     onClick={toggle}
                     className={`flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center transition-all shadow-lg ${
                       isRunning
@@ -679,7 +290,7 @@ export default function StudioPage() {
                     }`}
                   >
                     {isRunning ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-0.5" />}
-                  </button>
+                  </button>)}
                 </div>
 
                 {/* Level slider */}

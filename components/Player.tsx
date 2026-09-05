@@ -128,6 +128,8 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
     duration,
     volume,
     loopEnabled,
+    backgroundEnabled,
+    setBackgroundEnabled,
     normalizeEnabled,
     crossfadeDuration,
     timerMinutes,
@@ -265,7 +267,8 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
       // Always reload if track isn't loaded or audio setup incomplete
       const state = usePlayer.getState()
       if (currentTrack?.id !== track.id || !state.activeMediaSlot || !state.audioGraph) {
-        await loadTrack(track)
+        await loadTrack(track, true)
+        return
       }
       await play()
     }
@@ -368,6 +371,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
 
           {/* Center Play Button */}
           <button
+            aria-label={isPlaying ? "Pause track" : "Play track"}
             onClick={handlePlayPause}
             disabled={isLoading}
             className="absolute inset-0 z-10 flex items-center justify-center touch-manipulation"
@@ -554,6 +558,15 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
       {/* Advanced Settings */}
       {showSettings && (
         <div className="mt-5 p-5 bg-muted/5 rounded-xl space-y-6 border border-border/30">
+          <label className="flex items-center gap-3">
+            <input type="checkbox" checked={backgroundEnabled}
+              onChange={e => { void setBackgroundEnabled(e.target.checked).catch(console.error) }} />
+            <span>Background playback</span>
+          </label>
+          {backgroundEnabled && <p className="text-sm text-muted-foreground">
+            Keep the tab open to play while using other apps. Use your phone’s volume buttons.
+            Live noise, normalization and crossfading are available with this option off.
+          </p>}
           {/* Audio Processing */}
           <div>
             <h4 className="font-semibold mb-3 text-sm uppercase tracking-wider">Audio Processing</h4>
@@ -561,6 +574,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
               <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  disabled={backgroundEnabled}
                   checked={normalizeEnabled}
                   onChange={(e) => setNormalizeEnabled(e.target.checked)}
                   className="rounded border-border"
@@ -578,6 +592,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
                   min="0"
                   max="10"
                   step="1"
+                  disabled={backgroundEnabled}
                   value={crossfadeDuration}
                   onChange={(e) => setCrossfadeDuration(parseInt(e.target.value))}
                   className="w-full"
@@ -649,6 +664,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
               ].map(({ type, label }) => (
                 <button
                   key={label}
+                  disabled={backgroundEnabled}
                   onClick={() => setNoiseType(type)}
                   className={`px-3 py-2.5 text-sm rounded-xl transition-all ${
                     noiseType === type
@@ -668,6 +684,7 @@ export default function Player({ track: initialTrack, className = '' }: PlayerPr
                   min="0"
                   max="0.5"
                   step="0.01"
+                  disabled={backgroundEnabled}
                   value={noiseVolume}
                   onChange={(e) => setNoiseVolume(parseFloat(e.target.value))}
                   className="flex-1"

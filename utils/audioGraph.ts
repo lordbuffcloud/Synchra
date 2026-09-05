@@ -44,7 +44,7 @@ export class AudioGraph {
   }
 
   async resume() {
-    if (this.audioContext.state === 'suspended') {
+    if (this.audioContext.state !== 'running' && this.audioContext.state !== 'closed') {
       await this.audioContext.resume()
     }
   }
@@ -108,7 +108,20 @@ export class CrossfadeNode {
     this.outputNode.connect(destination)
   }
 
+  select(slot: 'A' | 'B') {
+    const now = this.audioContext.currentTime
+    this.inputA.gain.cancelScheduledValues(now)
+    this.inputB.gain.cancelScheduledValues(now)
+    this.inputA.gain.setValueAtTime(slot === 'A' ? 1 : 0, now)
+    this.inputB.gain.setValueAtTime(slot === 'B' ? 1 : 0, now)
+    this.currentInput = slot
+  }
+
   async crossfade(durationSeconds: number = 3) {
+    if (durationSeconds <= 0) {
+      this.select(this.currentInput === 'A' ? 'B' : 'A')
+      return
+    }
     const now = this.audioContext.currentTime
     
     if (this.currentInput === 'A') {
@@ -143,7 +156,7 @@ export class CrossfadeNode {
 
 export class NoiseGenerator {
   private audioContext: AudioContext
-  private bufferSize = 4096
+  private bufferSize = 44100 * 10
   private noiseBuffer!: AudioBuffer
   private sourceNode?: AudioBufferSourceNode
   private gainNode!: GainNode
@@ -152,6 +165,7 @@ export class NoiseGenerator {
 
   constructor(audioContext: AudioContext) {
     this.audioContext = audioContext
+    this.bufferSize = audioContext.sampleRate * 10
     this.setupNodes()
     this.generateNoiseBuffer()
   }

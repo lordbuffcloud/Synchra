@@ -1,5 +1,5 @@
-const CACHE_NAME = 'synchra-v2'
-const STATIC_CACHE_NAME = 'synchra-static-v2'
+const CACHE_NAME = 'synchra-v3'
+const STATIC_CACHE_NAME = 'synchra-static-v3'
 const AUDIO_CACHE_NAME = 'synchra-audio-v2'
 
 // Static assets to cache immediately
@@ -52,6 +52,9 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
     return
   }
+
+  // Let the browser negotiate partial audio responses with the server.
+  if (request.headers.has('range')) return
 
   // Handle audio files specially
   if (url.pathname.startsWith('/tracks/') && 

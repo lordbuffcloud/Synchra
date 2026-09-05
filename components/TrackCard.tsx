@@ -60,8 +60,7 @@ export default function TrackCard({ track, className = '' }: TrackCardProps) {
     e.stopPropagation()
     try {
       if (isCurrentTrack && isPlaying) return
-      await loadTrack(track)
-      await play()
+      await loadTrack(track, true)
     } catch (error) {
       console.error('Failed to play track:', error)
     }

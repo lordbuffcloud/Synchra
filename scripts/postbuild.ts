@@ -30,14 +30,14 @@ async function checkTracksManifest() {
       const aacPath = path.join('public', 'tracks', track.filenameAac)
       
       try {
-        await fs.access(webmPath)
+        if (!track.remoteWebmUrl) await fs.access(webmPath)
       } catch {
         console.error(`❌ Missing file: ${track.filenameWebm}`)
         missingFiles++
       }
       
       try {
-        await fs.access(aacPath)
+        if (!track.remoteAacUrl) await fs.access(aacPath)
       } catch {
         console.error(`❌ Missing file: ${track.filenameAac}`)
         missingFiles++

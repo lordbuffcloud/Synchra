@@ -7,9 +7,8 @@
  */
 
 import { put, list } from '@vercel/blob'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, readdirSync } from 'fs'
 import { basename, join } from 'path'
-import { glob } from 'glob'
 
 const TRACKS_DIR = join(__dirname, '..', 'public', 'tracks')
 const MANIFEST_PATH = join(TRACKS_DIR, 'tracks.json')
@@ -36,8 +35,9 @@ async function main() {
   }
 
   // Find all audio files
-  const webmFiles = await glob('*.webm', { cwd: TRACKS_DIR })
-  const m4aFiles = await glob('*.m4a', { cwd: TRACKS_DIR })
+  const files = readdirSync(TRACKS_DIR)
+  const webmFiles = files.filter(file => file.endsWith('.webm'))
+  const m4aFiles = files.filter(file => file.endsWith('.m4a'))
   const allFiles = [...webmFiles, ...m4aFiles].sort()
 
   console.log(`Found ${allFiles.length} audio files to upload (${webmFiles.length} webm + ${m4aFiles.length} m4a)`)
